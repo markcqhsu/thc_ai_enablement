@@ -26,48 +26,28 @@ const toArr  = v => v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
 const toNum  = v => parseFloat(v) || 0;
 
 async function loadFromSheets() {
-  const TAB_NAMES = ['kpis', 'regions', 'units', 'cases', 'talents', 'proposals', 'training', 'executiveItems', 'updates'];
-
-  const results = await Promise.allSettled(TAB_NAMES.map(t => fetchTab(t)));
+  const TABS = ['regions', 'units', 'cases', 'talents', 'training', 'updates'];
+  const results = await Promise.allSettled(TABS.map(t => fetchTab(t)));
   const get = i => (results[i].status === 'fulfilled' ? results[i].value : []);
 
-  // kpis（A欄 key, B欄 value）
-  const kpiMap = {};
-  get(0).slice(1).forEach(([k, v]) => { if (k) kpiMap[k] = v; });
-  if (Object.keys(kpiMap).length) {
-    APP_DATA.kpis = {
-      activatedUnits:   toNum(kpiMap.activatedUnits),
-      inventoriedUnits: toNum(kpiMap.inventoriedUnits),
-      pocInProgress:    toNum(kpiMap.pocInProgress),
-      liveApplications: toNum(kpiMap.liveApplications),
-      replicableCases:  toNum(kpiMap.replicableCases),
-      aiChampions:      toNum(kpiMap.aiChampions),
-      savedHours:       toNum(kpiMap.savedHours),
-      estimatedValue:   toNum(kpiMap.estimatedValue),
-    };
-  }
-
   // regions
-  const regRows = toObjects(get(1));
+  const regRows = toObjects(get(0));
   if (regRows.length) {
-    APP_DATA.regions = regRows.map(r => ({
-      ...r, units: toNum(r.units), active: toNum(r.active),
-    }));
+    APP_DATA.regions = regRows;
   }
 
   // units
-  const unitRows = toObjects(get(2));
+  const unitRows = toObjects(get(1));
   if (unitRows.length) {
     APP_DATA.units = unitRows.map((u, i) => ({
       id: i + 1, ...u,
-      hasAiTalent: toBool(u.hasAiTalent),
-      needSupport:  toBool(u.needSupport),
-      appTypes:     toArr(u.appTypes),
+      needSupport: toBool(u.needSupport),
+      pocItems:    toArr(u.pocItems),
     }));
   }
 
   // cases
-  const caseRows = toObjects(get(3));
+  const caseRows = toObjects(get(2));
   if (caseRows.length) {
     APP_DATA.cases = caseRows.map((c, i) => ({
       id: i + 1, ...c,
@@ -78,39 +58,30 @@ async function loadFromSheets() {
   }
 
   // talents
-  const talentRows = toObjects(get(4));
+  const talentRows = toObjects(get(3));
   if (talentRows.length) {
     APP_DATA.talents = talentRows.map((t, i) => ({
       id: i + 1, ...t,
-      completedProjects: toNum(t.completedProjects),
-      advancedEligible:  toBool(t.advancedEligible),
-      canSupportOthers:  toBool(t.canSupportOthers),
-      skills:            toArr(t.skills),
-      currentCases:      toArr(t.currentCases),
+      isSeed:           toBool(t.isSeed),
+      skills:           toArr(t.skills),
+      completedCourses: toArr(t.completedCourses),
     }));
-  }
-
-  // proposals
-  const propRows = toObjects(get(5));
-  if (propRows.length) {
-    APP_DATA.proposals = propRows.map((p, i) => ({ id: i + 1, ...p }));
   }
 
   // training
-  const trainRows = toObjects(get(6));
+  const trainRows = toObjects(get(4));
   if (trainRows.length) {
     APP_DATA.training = trainRows.map((t, i) => ({
       id: i + 1, ...t,
-      enrolled: toNum(t.enrolled),
-      capacity: toNum(t.capacity),
+      enrolled:     toNum(t.enrolled),
+      capacity:     toNum(t.capacity),
+      participants: toArr(t.participants),
     }));
   }
 
-  // executiveItems
-  const execRows = toObjects(get(7));
-  if (execRows.length) APP_DATA.executiveItems = execRows;
-
   // updates
-  const updateRows = toObjects(get(8));
-  if (updateRows.length) APP_DATA.updates = updateRows;
+  const updateRows = toObjects(get(5));
+  if (updateRows.length) {
+    APP_DATA.updates = updateRows;
+  }
 }
