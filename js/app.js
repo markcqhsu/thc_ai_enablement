@@ -554,7 +554,25 @@ function renderPlaceholder(el, page) {
 
 // ── Init ──
 
-document.getElementById('update-date').textContent =
-  '資料更新：' + new Date().toISOString().slice(0,10);
+async function init() {
+  document.getElementById('content').innerHTML = `
+    <div class="placeholder-page">
+      <div class="placeholder-icon">⏳</div>
+      <div class="placeholder-text">載入資料中...</div>
+      <div class="placeholder-sub">正在從 Google Sheets 讀取資料</div>
+    </div>
+  `;
 
-navigate('dashboard');
+  try {
+    await loadFromSheets();
+    document.getElementById('update-date').textContent =
+      '資料更新：' + new Date().toISOString().slice(0, 10);
+  } catch (err) {
+    console.warn('Sheets 讀取失敗，使用本地資料', err);
+    document.getElementById('update-date').textContent = '資料更新：本地資料';
+  }
+
+  navigate('dashboard');
+}
+
+init();
