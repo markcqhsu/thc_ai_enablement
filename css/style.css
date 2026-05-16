@@ -161,7 +161,7 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 .two-col.wide-left { grid-template-columns: 3fr 2fr; }
 
 /* ── Region Grid ── */
-.region-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.region-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
 .region-card {
   border-radius: var(--r-sm); padding: 14px;

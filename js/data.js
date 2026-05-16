@@ -18,7 +18,6 @@ const APP_DATA = {
     { name: '中國',   status: 'PoC 測試中', color: 'yellow', dot: '#f59e0b', units: 1, active: 1 },
     { name: '東南亞', status: '需求盤點中', color: 'blue',   dot: '#3b82f6', units: 1, active: 1 },
     { name: '美洲',   status: '未啟動',    color: 'gray',   dot: '#94a3b8', units: 1, active: 0 },
-    { name: '歐洲',   status: '未啟動',    color: 'gray',   dot: '#94a3b8', units: 1, active: 0 },
   ],
 
   funnel: [
@@ -92,15 +91,6 @@ const APP_DATA = {
       appTypes: [],
       repCase: '', estimatedBenefit: '',
       nextMilestone: '安排初次說明會', dueDate: '2026-07-31', lastUpdated: '',
-    },
-    {
-      id: 8, unitName: '歐洲業務', country: '德國', factory: 'EU-Sales',
-      aiContact: '', aiChampion: '',
-      hasAiTalent: false, needSupport: true,
-      maturityLevel: 'L0', currentStage: '未啟動',
-      appTypes: [],
-      repCase: '', estimatedBenefit: '',
-      nextMilestone: '確認聯絡窗口', dueDate: '', lastUpdated: '',
     },
   ],
 
