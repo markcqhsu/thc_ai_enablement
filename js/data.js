@@ -4,13 +4,13 @@ const APP_DATA = {
 
   // ── 地區 ──
   regions: [
-    { name: '台灣',     group: '台灣',   color: 'gold',   dot: '#d97706' },
-    { name: '中國',     group: '中國',   color: 'yellow', dot: '#f59e0b' },
-    { name: '越南',     group: '東南亞', color: 'blue',   dot: '#3b82f6' },
-    { name: '泰國',     group: '東南亞', color: 'lblue',  dot: '#93c5fd' },
-    { name: '馬來西亞', group: '東南亞', color: 'gray',   dot: '#94a3b8' },
-    { name: '緬甸',     group: '東南亞', color: 'gray',   dot: '#94a3b8' },
-    { name: '印尼',     group: '東南亞', color: 'gray',   dot: '#94a3b8' },
+    { name: '台灣',     group: '台灣',   color: 'gold'   },
+    { name: '中國',     group: '中國',   color: 'yellow' },
+    { name: '越南',     group: '東南亞', color: 'blue'   },
+    { name: '泰國',     group: '東南亞', color: 'lblue'  },
+    { name: '馬來西亞', group: '東南亞', color: 'gray'   },
+    { name: '緬甸',     group: '東南亞', color: 'gray'   },
+    { name: '印尼',     group: '東南亞', color: 'gray'   },
   ],
 
   // ── 單位 ──
