@@ -4,13 +4,15 @@ const APP_DATA = {
 
   // ── 地區 ──
   regions: [
-    { name: '台灣',     group: '台灣',   color: 'gold'   },
-    { name: '中國',     group: '中國',   color: 'yellow' },
-    { name: '越南',     group: '東南亞', color: 'blue'   },
-    { name: '泰國',     group: '東南亞', color: 'lblue'  },
-    { name: '馬來西亞', group: '東南亞', color: 'gray'   },
-    { name: '緬甸',     group: '東南亞', color: 'gray'   },
-    { name: '印尼',     group: '東南亞', color: 'gray'   },
+    { name: '台灣',     group: '台灣',     color: 'gold'   },
+    { name: '蘇宏總部', group: '中國宏全', color: 'yellow' },
+    { name: '清新廠',   group: '中國宏全', color: 'gray'   },
+    { name: '漳州廠',   group: '中國宏全', color: 'gray'   },
+    { name: '越南',     group: '東南亞總部', color: 'blue'   },
+    { name: '泰國',     group: '東南亞總部', color: 'lblue'  },
+    { name: '馬來西亞', group: '東南亞總部', color: 'gray'   },
+    { name: '緬甸',     group: '東南亞總部', color: 'gray'   },
+    { name: '印尼',     group: '東南亞總部', color: 'gray'   },
   ],
 
   // ── 單位 ──
@@ -48,7 +50,7 @@ const APP_DATA = {
       dueDate: '2026-07-15', lastUpdated: '2026-05-14',
     },
     {
-      id: 5, unitName: '中國廠（蘇州）', region: '中國', factory: 'CN-SZ',
+      id: 5, unitName: '蘇宏總部', region: '蘇宏總部', factory: 'CN-SZ',
       aiContact: '張偉', aiStaff: '張偉', needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['生產異常偵測'],
@@ -56,15 +58,23 @@ const APP_DATA = {
       dueDate: '2026-06-30', lastUpdated: '2026-05-08',
     },
     {
-      id: 6, unitName: '中國廠（上海）', region: '中國', factory: 'CN-SH',
-      aiContact: '陳志遠', aiStaff: '', needSupport: true,
-      maturityLevel: 'L1',
+      id: 6, unitName: '清新廠', region: '清新廠', factory: 'CN-QX',
+      aiContact: '', aiStaff: '', needSupport: true,
+      maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
-      dueDate: '', lastUpdated: '2026-04-01',
+      dueDate: '', lastUpdated: '',
     },
     {
-      id: 7, unitName: '越南廠', region: '越南', factory: 'VN-F1',
+      id: 7, unitName: '漳州廠', region: '漳州廠', factory: 'CN-ZZ',
+      aiContact: '', aiStaff: '', needSupport: true,
+      maturityLevel: 'L0',
+      pocItems: [],
+      estimatedBenefit: '',
+      dueDate: '', lastUpdated: '',
+    },
+    {
+      id: 8, unitName: '越南廠', region: '越南', factory: 'VN-F1',
       aiContact: 'Nguyen Van A', aiStaff: '', needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['多語言文件翻譯'],
@@ -72,7 +82,7 @@ const APP_DATA = {
       dueDate: '2026-06-15', lastUpdated: '2026-04-15',
     },
     {
-      id: 8, unitName: '泰國廠', region: '泰國', factory: 'TH-F1',
+      id: 9, unitName: '泰國廠', region: '泰國', factory: 'TH-F1',
       aiContact: 'Somchai P.', aiStaff: '', needSupport: true,
       maturityLevel: 'L1',
       pocItems: [],
@@ -80,7 +90,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '2026-04-10',
     },
     {
-      id: 9, unitName: '馬來西亞廠', region: '馬來西亞', factory: 'MY-F1',
+      id: 10, unitName: '馬來西亞廠', region: '馬來西亞', factory: 'MY-F1',
       aiContact: '', aiStaff: '', needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -88,7 +98,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 10, unitName: '緬甸廠', region: '緬甸', factory: 'MM-F1',
+      id: 11, unitName: '緬甸廠', region: '緬甸', factory: 'MM-F1',
       aiContact: '', aiStaff: '', needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -96,7 +106,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 11, unitName: '印尼廠', region: '印尼', factory: 'ID-F1',
+      id: 12, unitName: '印尼廠', region: '印尼', factory: 'ID-F1',
       aiContact: '', aiStaff: '', needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
