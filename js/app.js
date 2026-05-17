@@ -4,6 +4,7 @@ const PAGE_TITLES = {
   cases:     'AI 應用案例',
   talent:    'AI 人才網路',
   training:  '課程安排',
+  api:       'API 用量管理',
 };
 
 // ── Helpers ──
@@ -48,13 +49,14 @@ function navigate(page) {
     case 'cases':     renderCases(content);     break;
     case 'talent':    renderTalent(content);    break;
     case 'training':  renderTraining(content);  break;
+    case 'api':       renderApiUsage(content);  break;
   }
 }
 
 // ── Dashboard ──
 
 function renderDashboard(el) {
-  const { units, cases, talents, regions, updates } = APP_DATA;
+  const { units, cases, talents, regions, updates, api_usage } = APP_DATA;
 
   const completedApps   = cases.filter(c => c.stage === 'completed').length;
   const pocInProgress   = cases.filter(c => c.stage === 'poc').length;
@@ -67,6 +69,14 @@ function renderDashboard(el) {
     count: units.filter(u => u.maturityLevel === l).length,
   }));
   const maxCount = Math.max(...levelCounts.map(l => l.count), 1);
+
+  // API usage summary for dashboard
+  const apiMonths = [...new Set(api_usage.map(r => r.month))].sort().reverse();
+  const apiLatestMonth = apiMonths[0] || '';
+  const apiLatest = api_usage.filter(r => r.month === apiLatestMonth);
+  const apiTotalCost = apiLatest.reduce((s, r) => s + r.cost_usd, 0);
+  const apiTotalBudget = apiLatest.reduce((s, r) => s + r.budget_usd, 0);
+  const apiOverCount = apiLatest.filter(r => r.cost_usd > r.budget_usd).length;
 
   // Region groups
   const grouped = {};
@@ -99,6 +109,40 @@ function renderDashboard(el) {
         <div class="kpi-sub">可推廣至其他單位</div>
       </div>
     </div>
+
+    <!-- API Usage Summary -->
+    ${apiLatest.length ? `
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:0">API 用量快覽（${apiLatestMonth}）</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span style="font-size:13px;color:var(--text-muted)">
+            本月花費 <strong style="color:var(--text)">$${apiTotalCost.toFixed(2)}</strong>
+            / 預算 $${apiTotalBudget.toFixed(2)}
+            ${apiOverCount > 0 ? `<span class="tag tag-red" style="margin-left:6px">${apiOverCount} 單位超出</span>` : '<span class="tag tag-green" style="margin-left:6px">全部正常</span>'}
+          </span>
+          <a onclick="navigate('api')" style="font-size:12px;color:var(--primary);cursor:pointer;white-space:nowrap">查看詳情 →</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        ${apiLatest.map(r => {
+          const pct = Math.min(r.cost_usd / r.budget_usd * 100, 100);
+          const over = r.cost_usd > r.budget_usd;
+          return `
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:96px;font-size:12px;font-weight:500;flex-shrink:0;color:var(--text)">${r.unit}</span>
+              <span class="api-provider-badge api-provider-${r.provider.toLowerCase()}" style="flex-shrink:0">${r.provider}</span>
+              <div style="flex:1;background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden">
+                <div style="width:${pct}%;height:100%;background:${over ? '#ef4444' : '#2563eb'};border-radius:4px"></div>
+              </div>
+              <span style="width:100px;font-size:12px;color:${over ? '#ef4444' : 'var(--text-muted)'};text-align:right;flex-shrink:0;font-weight:${over ? '600' : '400'}">
+                $${r.cost_usd.toFixed(2)} / $${r.budget_usd.toFixed(2)}
+              </span>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+    ` : ''}
 
     <!-- Maturity Matrix + Side Panel -->
     <div class="two-col wide-left" style="margin-bottom:20px">
@@ -558,6 +602,157 @@ function renderTraining(el) {
               `).join('')}
             </tr>
           `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── API Usage ──
+
+function renderApiUsage(el) {
+  const { api_usage } = APP_DATA;
+
+  if (!api_usage.length) {
+    el.innerHTML = `<div class="placeholder-page">
+      <div class="placeholder-icon">💳</div>
+      <div class="placeholder-text">尚無 API 用量資料</div>
+      <div class="placeholder-sub">請在 Google Sheets 的 api_usage 分頁填入資料</div>
+    </div>`;
+    return;
+  }
+
+  const months = [...new Set(api_usage.map(r => r.month))].sort().reverse();
+  const latestMonth = months[0];
+  const latestData = api_usage.filter(r => r.month === latestMonth);
+
+  const totalCost   = latestData.reduce((s, r) => s + r.cost_usd, 0);
+  const totalBudget = latestData.reduce((s, r) => s + r.budget_usd, 0);
+  const overUnits   = latestData.filter(r => r.cost_usd > r.budget_usd).length;
+
+  // Provider breakdown
+  const byProvider = {};
+  latestData.forEach(r => {
+    byProvider[r.provider] = (byProvider[r.provider] || 0) + r.cost_usd;
+  });
+
+  el.innerHTML = `
+    <!-- KPI -->
+    <div class="kpi-grid kpi-grid-3" style="margin-bottom:20px">
+      <div class="kpi-card blue">
+        <div class="kpi-label">本月總花費</div>
+        <div class="kpi-value">$${totalCost.toFixed(2)}</div>
+        <div class="kpi-sub">預算 $${totalBudget.toFixed(2)} · ${latestMonth}</div>
+      </div>
+      <div class="kpi-card ${overUnits > 0 ? 'yellow' : 'green'}">
+        <div class="kpi-label">超出預算單位</div>
+        <div class="kpi-value">${overUnits}</div>
+        <div class="kpi-sub">${overUnits > 0 ? '需調整用量或預算' : '全部單位在預算內'}</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">使用單位數</div>
+        <div class="kpi-value">${latestData.length}</div>
+        <div class="kpi-sub">個單位本月有使用紀錄</div>
+      </div>
+    </div>
+
+    <!-- Provider breakdown + month tabs -->
+    <div class="two-col" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">Provider 費用分佈（${latestMonth}）</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          ${Object.entries(byProvider).map(([provider, cost]) => {
+            const pct = Math.round(cost / totalCost * 100);
+            const provClass = `api-provider-${provider.toLowerCase()}`;
+            return `
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                  <span class="api-provider-badge ${provClass}">${provider}</span>
+                  <span style="font-size:13px;font-weight:600">$${cost.toFixed(2)} <span style="font-size:11px;color:var(--text-muted);font-weight:400">${pct}%</span></span>
+                </div>
+                <div style="background:#f1f5f9;border-radius:4px;height:10px;overflow:hidden">
+                  <div style="width:${pct}%;height:100%;border-radius:4px;${provider==='Anthropic'?'background:#a855f7':'background:#22c55e'}"></div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">月份摘要</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${months.map(m => {
+            const mData = api_usage.filter(r => r.month === m);
+            const mCost = mData.reduce((s, r) => s + r.cost_usd, 0);
+            const mBudget = mData.reduce((s, r) => s + r.budget_usd, 0);
+            const mOver = mData.filter(r => r.cost_usd > r.budget_usd).length;
+            return `
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:${m===latestMonth?'#eff6ff':'#f8fafc'};border:1px solid ${m===latestMonth?'#bfdbfe':'#e2e8f0'}">
+                <span style="font-size:13px;font-weight:600;width:70px">${m}</span>
+                <span style="flex:1;font-size:13px">$${mCost.toFixed(2)} <span style="color:var(--text-muted);font-size:11px">/ $${mBudget.toFixed(2)}</span></span>
+                ${mOver > 0 ? `<span class="tag tag-red">${mOver} 超出</span>` : '<span class="tag tag-green">正常</span>'}
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-unit cards -->
+    <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
+      各單位用量（${latestMonth}）
+    </div>
+    <div class="api-usage-grid">
+      ${latestData.map(r => {
+        const pct = Math.min(r.cost_usd / r.budget_usd * 100, 100);
+        const over = r.cost_usd > r.budget_usd;
+        const provClass = `api-provider-${r.provider.toLowerCase()}`;
+        return `
+          <div class="api-unit-card">
+            <div class="api-unit-header">
+              <div class="api-unit-name">${r.unit}</div>
+              <span class="api-provider-badge ${provClass}">${r.provider}</span>
+            </div>
+            <div class="api-budget-row">
+              <span>花費 / 預算</span>
+              <span style="color:${over ? '#ef4444' : 'var(--text)'};font-weight:${over ? '600' : '400'}">
+                ${over ? '⚠ ' : ''}$${r.cost_usd.toFixed(2)} / $${r.budget_usd.toFixed(2)}
+              </span>
+            </div>
+            <div class="api-budget-bar">
+              <div class="api-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
+            </div>
+            <div class="api-stats-row">
+              <span>Tokens：<span class="api-stat-num">${r.tokens >= 1000 ? (r.tokens/1000).toFixed(0)+'K' : r.tokens}</span></span>
+              <span>使用率：<span class="api-stat-num${over ? ' api-over-warn' : ''}">${Math.round(r.cost_usd / r.budget_usd * 100)}%</span></span>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <!-- History table -->
+    <div class="card" style="margin-top:20px;overflow-x:auto">
+      <div class="card-title">所有紀錄</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>月份</th><th>單位</th><th>Provider</th>
+            <th>Tokens</th><th>花費 (USD)</th><th>預算 (USD)</th><th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${[...api_usage].sort((a,b) => b.month.localeCompare(a.month) || a.unit.localeCompare(b.unit)).map(r => `
+            <tr>
+              <td style="color:var(--text-muted)">${r.month}</td>
+              <td><strong>${r.unit}</strong></td>
+              <td><span class="api-provider-badge api-provider-${r.provider.toLowerCase()}">${r.provider}</span></td>
+              <td>${r.tokens >= 1000 ? (r.tokens/1000).toFixed(0)+'K' : r.tokens}</td>
+              <td style="font-weight:500">$${r.cost_usd.toFixed(2)}</td>
+              <td style="color:var(--text-muted)">$${r.budget_usd.toFixed(2)}</td>
+              <td>${r.cost_usd > r.budget_usd
+                ? '<span class="tag tag-red">超出預算</span>'
+                : r.cost_usd / r.budget_usd >= 0.8
+                  ? '<span class="tag tag-yellow">接近上限</span>'
+                  : '<span class="tag tag-green">正常</span>'}</td>
+            </tr>`).join('')}
         </tbody>
       </table>
     </div>

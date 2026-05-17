@@ -26,7 +26,7 @@ const toArr  = v => v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
 const toNum  = v => parseFloat(v) || 0;
 
 async function loadFromSheets() {
-  const TABS = ['regions', 'units', 'cases', 'talents', 'training', 'updates'];
+  const TABS = ['regions', 'units', 'cases', 'talents', 'training', 'updates', 'api_usage'];
   const results = await Promise.allSettled(TABS.map(t => fetchTab(t)));
   const get = i => (results[i].status === 'fulfilled' ? results[i].value : []);
 
@@ -83,5 +83,16 @@ async function loadFromSheets() {
   const updateRows = toObjects(get(5));
   if (updateRows.length) {
     APP_DATA.updates = updateRows;
+  }
+
+  // api_usage
+  const apiRows = toObjects(get(6));
+  if (apiRows.length) {
+    APP_DATA.api_usage = apiRows.map(r => ({
+      ...r,
+      tokens:     toNum(r.tokens),
+      cost_usd:   toNum(r.cost_usd),
+      budget_usd: toNum(r.budget_usd),
+    }));
   }
 }

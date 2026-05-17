@@ -282,6 +282,18 @@ const APP_DATA = {
     },
   ],
 
+  // ── API 用量 ──
+  api_usage: [
+    { unit: '企劃室',      provider: 'Anthropic', month: '2026-05', tokens: 125000, cost_usd: 3.75, budget_usd: 20 },
+    { unit: '台灣無菌一廠', provider: 'OpenAI',   month: '2026-05', tokens: 85000,  cost_usd: 2.55, budget_usd: 15 },
+    { unit: '台灣業務部',   provider: 'OpenAI',   month: '2026-05', tokens: 210000, cost_usd: 6.30, budget_usd: 5  },
+    { unit: '蘇宏總部',     provider: 'Anthropic', month: '2026-05', tokens: 45000,  cost_usd: 1.35, budget_usd: 10 },
+    { unit: '越南廠',       provider: 'OpenAI',   month: '2026-05', tokens: 30000,  cost_usd: 0.90, budget_usd: 10 },
+    { unit: '企劃室',      provider: 'Anthropic', month: '2026-04', tokens: 98000,  cost_usd: 2.94, budget_usd: 20 },
+    { unit: '台灣無菌一廠', provider: 'OpenAI',   month: '2026-04', tokens: 62000,  cost_usd: 1.86, budget_usd: 15 },
+    { unit: '台灣業務部',   provider: 'OpenAI',   month: '2026-04', tokens: 145000, cost_usd: 4.35, budget_usd: 5  },
+  ],
+
   // ── 最新動態 ──
   updates: [
     { text: '台灣無菌一廠 瓶蓋 OCR 正式上線，月節省 120 工時', date: '2026-05-12' },
