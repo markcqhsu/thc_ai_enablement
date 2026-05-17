@@ -471,3 +471,128 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Hamburger ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px; height: 44px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 10px 8px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  border-radius: var(--r-sm);
+}
+.hamburger span {
+  display: block;
+  width: 20px; height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.hamburger:hover { background: #f1f5f9; }
+
+/* ── Topbar left group ── */
+.topbar { justify-content: space-between; }
+.topbar-left { display: flex; align-items: center; min-width: 0; }
+.topbar-left .page-title { margin: 0; }
+
+/* ── Sidebar Overlay ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 99;
+}
+.sidebar-overlay.open { display: block; }
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  body { font-size: 16px; }
+
+  .hamburger { display: flex; }
+
+  /* Sidebar becomes a slide-in drawer */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  /* Main fills full height */
+  .app { height: auto; min-height: 100dvh; overflow: visible; }
+  .main { height: 100dvh; }
+
+  /* Content padding */
+  .content { padding: 16px; }
+
+  /* Topbar */
+  .topbar { padding: 0 12px; }
+  .page-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .update-badge { font-size: 11px; padding: 3px 8px; white-space: nowrap; }
+
+  /* KPI grids → 2 cols */
+  .kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .kpi-grid-3 { grid-template-columns: repeat(2, 1fr); }
+
+  /* Two-col → 1 col */
+  .two-col,
+  .two-col.wide-left { grid-template-columns: 1fr; }
+
+  /* Region grid → 2 cols */
+  .region-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Stats rows */
+  .stats-row.cols-3,
+  .stats-row.cols-4 { grid-template-columns: repeat(2, 1fr); }
+
+  /* Case / talent / training → 1 col */
+  .case-grid { grid-template-columns: 1fr; }
+  .talent-grid { grid-template-columns: 1fr; }
+  .training-grid { grid-template-columns: 1fr; }
+
+  /* API usage → 1 col */
+  .api-usage-grid { grid-template-columns: 1fr; }
+
+  /* Proposal card → stack */
+  .proposal-card { flex-direction: column; gap: 8px; }
+  .proposal-status-col { width: auto; }
+
+  /* Page header → stack */
+  .page-header { flex-direction: column; align-items: stretch; }
+  .filter-bar { flex-wrap: wrap; }
+
+  /* Tab bar → horizontal scroll */
+  .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; flex-wrap: nowrap; }
+  .tab-btn { white-space: nowrap; flex-shrink: 0; }
+
+  /* Tables → horizontal scroll */
+  .data-table,
+  .maturity-table,
+  .cases-mini-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+  .data-table td,
+  .data-table th { white-space: nowrap; }
+
+  /* KPI value slightly smaller */
+  .kpi-value { font-size: 22px; }
+  .stat-value { font-size: 24px; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .region-grid { grid-template-columns: repeat(3, 1fr); }
+  .content { padding: 20px; }
+}

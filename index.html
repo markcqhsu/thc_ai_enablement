@@ -42,13 +42,19 @@
 
     <div class="main">
       <header class="topbar">
-        <h1 class="page-title" id="page-title">集團總覽</h1>
+        <div class="topbar-left">
+          <button class="hamburger" onclick="toggleSidebar()" aria-label="開啟選單">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="page-title" id="page-title">集團總覽</h1>
+        </div>
         <div class="topbar-right">
           <span class="update-badge" id="update-date">資料更新：—</span>
         </div>
       </header>
       <div class="content" id="content"></div>
     </div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
   </div>
 
   <script src="js/data.js"></script>

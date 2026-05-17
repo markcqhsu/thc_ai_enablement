@@ -36,11 +36,24 @@ function bool(val) {
 
 // ── Navigation ──
 
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function closeSidebarOnMobile() {
+  if (window.innerWidth < 768) {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  }
+}
+
 function navigate(page) {
   document.querySelectorAll('.nav-item').forEach(el =>
     el.classList.toggle('active', el.dataset.page === page)
   );
   document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
+  closeSidebarOnMobile();
 
   const content = document.getElementById('content');
   switch (page) {
@@ -721,7 +734,6 @@ function renderApiUsage(el) {
               <div class="api-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
             </div>
             <div class="api-stats-row">
-              <span>Tokens：<span class="api-stat-num">${r.tokens >= 1000 ? (r.tokens/1000).toFixed(0)+'K' : r.tokens}</span></span>
               <span>使用率：<span class="api-stat-num${over ? ' api-over-warn' : ''}">${Math.round(r.cost_usd / r.budget_usd * 100)}%</span></span>
             </div>
           </div>`;
@@ -735,7 +747,7 @@ function renderApiUsage(el) {
         <thead>
           <tr>
             <th>月份</th><th>單位</th><th>Provider</th>
-            <th>Tokens</th><th>花費 (USD)</th><th>預算 (USD)</th><th>狀態</th>
+            <th>花費 (USD)</th><th>預算 (USD)</th><th>狀態</th>
           </tr>
         </thead>
         <tbody>
@@ -744,7 +756,6 @@ function renderApiUsage(el) {
               <td style="color:var(--text-muted)">${r.month}</td>
               <td><strong>${r.unit}</strong></td>
               <td><span class="api-provider-badge api-provider-${r.provider.toLowerCase()}">${r.provider}</span></td>
-              <td>${r.tokens >= 1000 ? (r.tokens/1000).toFixed(0)+'K' : r.tokens}</td>
               <td style="font-weight:500">$${r.cost_usd.toFixed(2)}</td>
               <td style="color:var(--text-muted)">$${r.budget_usd.toFixed(2)}</td>
               <td>${r.cost_usd > r.budget_usd
