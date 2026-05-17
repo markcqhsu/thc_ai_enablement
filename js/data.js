@@ -19,7 +19,7 @@ const APP_DATA = {
   units: [
     {
       id: 1, unitName: '企劃室', region: '台灣', factory: '總部',
-      aiContact: '林志豪', aiStaff: '林志豪', needSupport: false,
+      aiContact: '林志豪', aiStaff: ['林志豪'], needSupport: false,
       maturityLevel: 'L5',
       pocItems: ['AI 戰情儀表板', 'OCR 整合工具'],
       estimatedBenefit: '節省 60% 報告時間',
@@ -27,7 +27,7 @@ const APP_DATA = {
     },
     {
       id: 2, unitName: '台灣無菌一廠', region: '台灣', factory: 'TW-F1',
-      aiContact: '陳美玲', aiStaff: '陳美玲', needSupport: false,
+      aiContact: '陳美玲', aiStaff: ['陳美玲'], needSupport: false,
       maturityLevel: 'L4',
       pocItems: ['瓶蓋 OCR 辨識'],
       estimatedBenefit: '節省 40% 人工檢查',
@@ -35,7 +35,7 @@ const APP_DATA = {
     },
     {
       id: 3, unitName: '台灣無菌二廠', region: '台灣', factory: 'TW-F2',
-      aiContact: '', aiStaff: '', needSupport: true,
+      aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
@@ -43,7 +43,7 @@ const APP_DATA = {
     },
     {
       id: 4, unitName: '台灣無菌三廠', region: '台灣', factory: 'TW-F3',
-      aiContact: '王大明', aiStaff: '', needSupport: true,
+      aiContact: '王大明', aiStaff: [], needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['調撥單 OCR'],
       estimatedBenefit: '縮短 30% 文件流程',
@@ -51,7 +51,7 @@ const APP_DATA = {
     },
     {
       id: 5, unitName: '台灣業務部', region: '台灣', factory: '總部',
-      aiContact: '李小雨', aiStaff: '李小雨', needSupport: false,
+      aiContact: '李小雨', aiStaff: ['李小雨'], needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['客戶詢問自動回覆'],
       estimatedBenefit: '節省 50% 詢答時間',
@@ -59,7 +59,7 @@ const APP_DATA = {
     },
     {
       id: 6, unitName: '蘇宏總部', region: '蘇宏總部', factory: 'CN-SZ',
-      aiContact: '張偉', aiStaff: '張偉', needSupport: false,
+      aiContact: '張偉', aiStaff: ['張偉'], needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['生產異常偵測'],
       estimatedBenefit: '降低 20% 停線',
@@ -67,7 +67,7 @@ const APP_DATA = {
     },
     {
       id: 7, unitName: '清新廠', region: '清新廠', factory: 'CN-QX',
-      aiContact: '', aiStaff: '', needSupport: true,
+      aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
@@ -75,7 +75,7 @@ const APP_DATA = {
     },
     {
       id: 8, unitName: '漳州廠', region: '漳州廠', factory: 'CN-ZZ',
-      aiContact: '', aiStaff: '', needSupport: true,
+      aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
@@ -83,7 +83,7 @@ const APP_DATA = {
     },
     {
       id: 9, unitName: '越南廠', region: '越南', factory: 'VN-F1',
-      aiContact: 'Nguyen Van A', aiStaff: '', needSupport: true,
+      aiContact: 'Nguyen Van A', aiStaff: [], needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['多語言文件翻譯'],
       estimatedBenefit: '縮短 50% 跨語言溝通',
@@ -91,7 +91,7 @@ const APP_DATA = {
     },
     {
       id: 10, unitName: '泰國廠', region: '泰國', factory: 'TH-F1',
-      aiContact: 'Somchai P.', aiStaff: '', needSupport: true,
+      aiContact: 'Somchai P.', aiStaff: [], needSupport: true,
       maturityLevel: 'L1',
       pocItems: [],
       estimatedBenefit: '',
@@ -99,7 +99,7 @@ const APP_DATA = {
     },
     {
       id: 11, unitName: '馬來西亞廠', region: '馬來西亞', factory: 'MY-F1',
-      aiContact: '', aiStaff: '', needSupport: true,
+      aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
@@ -107,7 +107,7 @@ const APP_DATA = {
     },
     {
       id: 12, unitName: '緬甸廠', region: '緬甸', factory: 'MM-F1',
-      aiContact: '', aiStaff: '', needSupport: true,
+      aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
@@ -115,7 +115,7 @@ const APP_DATA = {
     },
     {
       id: 13, unitName: '印尼廠', region: '印尼', factory: 'ID-F1',
-      aiContact: '', aiStaff: '', needSupport: true,
+      aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
       estimatedBenefit: '',
@@ -280,6 +280,17 @@ const APP_DATA = {
       status: '規劃中',
       participants: [],
     },
+  ],
+
+  // ── 訓練紀錄 ──
+  training_records: [
+    { name: '林志豪', course: 'AI Workflow 自動化', status: 'completed', date: '2026-04-10' },
+    { name: '林志豪', course: 'API 串接實作',       status: 'completed', date: '2026-05-01' },
+    { name: '林志豪', course: 'AI Agent 開發',      status: 'enrolled',  date: '' },
+    { name: '陳美玲', course: 'AI Workflow 自動化', status: 'completed', date: '2026-04-10' },
+    { name: '陳美玲', course: 'API 串接實作',       status: 'enrolled',  date: '' },
+    { name: '張偉',   course: 'AI Workflow 自動化', status: 'completed', date: '2026-04-10' },
+    { name: '李小雨', course: 'AI Workflow 自動化', status: 'enrolled',  date: '' },
   ],
 
   // ── API 用量 ──

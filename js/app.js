@@ -314,7 +314,11 @@ function unitsRows(list) {
       <td><strong>${u.unitName}</strong></td>
       <td style="white-space:nowrap">${u.region}</td>
       <td>${u.aiContact || '<span style="color:#94a3b8">—</span>'}</td>
-      <td>${u.aiStaff || '<span style="color:#94a3b8">—</span>'}</td>
+      <td>
+        ${u.aiStaff && u.aiStaff.length
+          ? u.aiStaff.map(s => `<span class="tag tag-blue" style="margin:1px 2px 1px 0">${s}</span>`).join('')
+          : '<span style="color:#94a3b8">—</span>'}
+      </td>
       <td>${bool(u.needSupport)}</td>
       <td>
         <span class="level-badge" style="background:${m.color}">${u.maturityLevel}</span>
@@ -431,7 +435,7 @@ function caseCards(list) {
 // ── Talent ──
 
 function renderTalent(el) {
-  const { talents, units, training } = APP_DATA;
+  const { talents, units, training, training_records } = APP_DATA;
 
   const seedCount = talents.filter(t => t.isSeed).length;
   const regions = [...new Set(talents.map(t => t.region))];
@@ -455,8 +459,8 @@ function renderTalent(el) {
         <div class="kpi-sub">個地區有 AI 人才</div>
       </div>
       <div class="kpi-card green">
-        <div class="kpi-label">累計修課人次</div>
-        <div class="kpi-value">${talents.reduce((s,t)=>s+t.completedCourses.length,0)}</div>
+        <div class="kpi-label">累計完課人次</div>
+        <div class="kpi-value">${training_records.filter(r=>r.status==='completed').length}</div>
         <div class="kpi-sub">已完成課程紀錄</div>
       </div>
     </div>
@@ -491,16 +495,30 @@ function renderTalent(el) {
                 ${t.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}
               </div>
 
-              ${t.completedCourses.length ? `
-                <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
-                  <div style="font-size:11px;color:#94a3b8;margin-bottom:5px">已完成課程</div>
-                  ${t.completedCourses.map(c=>`
-                    <div style="display:flex;align-items:center;gap:4px;font-size:12px;margin-bottom:3px">
-                      <span style="color:#22c55e;font-size:10px">✓</span>${c}
-                    </div>
-                  `).join('')}
-                </div>
-              ` : ''}
+              ${(() => {
+                const myRecords = training_records.filter(r => r.name === t.name);
+                const completed = myRecords.filter(r => r.status === 'completed');
+                const enrolled  = myRecords.filter(r => r.status === 'enrolled');
+                if (!myRecords.length) return '';
+                return `
+                  <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
+                    ${completed.length ? `
+                      <div style="font-size:11px;color:#94a3b8;margin-bottom:5px">已完成</div>
+                      ${completed.map(r=>`
+                        <div style="display:flex;align-items:center;gap:4px;font-size:12px;margin-bottom:3px">
+                          <span style="color:#22c55e;font-weight:700">✓</span>${r.course}
+                          ${r.date ? `<span style="color:#94a3b8;font-size:10px">${r.date}</span>` : ''}
+                        </div>`).join('')}
+                    ` : ''}
+                    ${enrolled.length ? `
+                      <div style="font-size:11px;color:#94a3b8;margin:8px 0 5px">報名中</div>
+                      ${enrolled.map(r=>`
+                        <div style="display:flex;align-items:center;gap:4px;font-size:12px;margin-bottom:3px">
+                          <span style="color:#f59e0b;font-weight:700">○</span>${r.course}
+                        </div>`).join('')}
+                    ` : ''}
+                  </div>`;
+              })()}
             </div>
           `).join('')}
         </div>
@@ -509,7 +527,7 @@ function renderTalent(el) {
 
     <!-- Units without AI staff -->
     ${(() => {
-      const noStaff = units.filter(u => !u.aiStaff);
+      const noStaff = units.filter(u => !u.aiStaff || !u.aiStaff.length);
       if (!noStaff.length) return '';
       return `
         <div class="card" style="margin-top:4px">
@@ -531,7 +549,7 @@ function renderTalent(el) {
 // ── Training ──
 
 function renderTraining(el) {
-  const { training, talents } = APP_DATA;
+  const { training, talents, training_records } = APP_DATA;
 
   el.innerHTML = `
     <!-- Stats -->
@@ -548,8 +566,8 @@ function renderTraining(el) {
       </div>
       <div class="kpi-card yellow">
         <div class="kpi-label">已報名人次</div>
-        <div class="kpi-value">${training.reduce((s,t)=>s+t.enrolled,0)}</div>
-        <div class="kpi-sub">累計報名</div>
+        <div class="kpi-value">${training_records.length}</div>
+        <div class="kpi-sub">累計報名人次</div>
       </div>
     </div>
 
@@ -571,19 +589,29 @@ function renderTraining(el) {
             <div class="progress-fill" style="width:${Math.round((t.enrolled/t.capacity)*100)}%"></div>
           </div>
 
-          ${t.participants.length ? `
-            <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
-              <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">已報名學員</div>
-              <div style="display:flex;flex-wrap:wrap;gap:4px">
-                ${t.participants.map(p => {
-                  const talent = talents.find(tl => tl.name === p);
-                  return `<span class="tag" style="background:#f0fdf4;color:#166534;font-size:11px">
-                    ${talent?.isSeed ? '⭐ ' : ''}${p}
-                  </span>`;
-                }).join('')}
-              </div>
-            </div>
-          ` : `<div style="margin-top:10px;font-size:12px;color:#94a3b8">尚無報名學員</div>`}
+          ${(() => {
+            const records = training_records.filter(r => r.course === t.module);
+            const completed = records.filter(r => r.status === 'completed');
+            const enrolled  = records.filter(r => r.status === 'enrolled');
+            if (!records.length) return `<div style="margin-top:10px;font-size:12px;color:#94a3b8">尚無報名學員</div>`;
+            const chip = (r, bg, color) => {
+              const talent = talents.find(tl => tl.name === r.name);
+              return `<span class="tag" style="background:${bg};color:${color};font-size:11px">${talent?.isSeed ? '⭐ ' : ''}${r.name}</span>`;
+            };
+            return `
+              <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
+                ${completed.length ? `
+                  <div style="font-size:11px;color:#94a3b8;margin-bottom:5px">已完成（${completed.length}）</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+                    ${completed.map(r => chip(r,'#f0fdf4','#166534')).join('')}
+                  </div>` : ''}
+                ${enrolled.length ? `
+                  <div style="font-size:11px;color:#94a3b8;margin-bottom:5px">報名中（${enrolled.length}）</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:4px">
+                    ${enrolled.map(r => chip(r,'#fef9c3','#854d0e')).join('')}
+                  </div>` : ''}
+              </div>`;
+          })()}
         </div>
       `).join('')}
     </div>
@@ -606,13 +634,12 @@ function renderTraining(el) {
                 ${tl.name}
               </td>
               <td style="color:#64748b">${tl.unit}</td>
-              ${training.map(tr => `
-                <td style="text-align:center">
-                  ${tr.participants.includes(tl.name)
-                    ? `<span style="color:#22c55e;font-size:16px">✓</span>`
-                    : `<span style="color:#e2e8f0;font-size:16px">○</span>`}
-                </td>
-              `).join('')}
+              ${training.map(tr => {
+                const rec = training_records.find(r => r.name === tl.name && r.course === tr.module);
+                if (!rec) return `<td style="text-align:center"><span style="color:#e2e8f0">—</span></td>`;
+                if (rec.status === 'completed') return `<td style="text-align:center" title="${rec.date}"><span style="color:#22c55e;font-size:15px;font-weight:700">✓</span></td>`;
+                return `<td style="text-align:center"><span style="color:#f59e0b;font-size:15px">○</span></td>`;
+              }).join('')}
             </tr>
           `).join('')}
         </tbody>
@@ -692,6 +719,7 @@ function renderApiUsage(el) {
       </div>
       <div class="card">
         <div class="card-title">月份摘要</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">每個月的 5 號做更新</div>
         <div style="display:flex;flex-direction:column;gap:8px">
           ${months.map(m => {
             const mData = api_usage.filter(r => r.month === m);
