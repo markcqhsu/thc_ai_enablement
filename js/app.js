@@ -213,16 +213,16 @@ function renderDashboard(el) {
         <!-- Summary bars -->
         <div class="maturity-summary">
           ${levelCounts.map(l => `
-            <div class="msummary-row" style="margin-bottom:8px">
-              <span class="msummary-label">
-                <span class="level-badge" style="background:${l.color};font-size:10px;width:24px;height:24px">${l.level}</span>
-                <span class="msummary-name">${l.label}</span>
-              </span>
-              <div style="flex:1;display:flex;flex-direction:column;gap:3px">
-                <div class="msummary-bar-wrap" style="margin:0">
-                  <div class="msummary-bar" style="width:${l.count ? (l.count/maxCount)*100 : 0}%;background:${l.color}"></div>
+            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+              <div style="display:flex;align-items:center;gap:6px;width:100px;flex-shrink:0;padding-top:1px">
+                <span class="level-badge" style="background:${l.color};font-size:10px;width:24px;height:24px;flex-shrink:0">${l.level}</span>
+                <span style="font-size:12px;color:var(--text-muted)">${l.label}</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="background:#f1f5f9;border-radius:4px;height:16px;overflow:hidden">
+                  <div style="width:${l.count ? (l.count/maxCount)*100 : 0}%;height:100%;background:${l.color};border-radius:4px;transition:width .5s ease"></div>
                 </div>
-                <div style="font-size:10px;color:#94a3b8">${l.desc}</div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:3px">${l.desc}</div>
               </div>
               <span class="msummary-count">${l.count} 單位</span>
             </div>
