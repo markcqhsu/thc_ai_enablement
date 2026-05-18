@@ -111,9 +111,19 @@ function renderDashboard(el) {
     }
   });
 
+  // Auto-generate virtual top-level entries for parents referenced but missing as rows
+  const regionNames = new Set(regions.map(r => r.name));
+  const allRegions = [...regions];
+  Object.keys(childrenOf).forEach(parentName => {
+    if (!regionNames.has(parentName)) {
+      const firstChild = childrenOf[parentName][0];
+      allRegions.push({ name: parentName, group: firstChild.group, color: firstChild.color, parent: '' });
+    }
+  });
+
   // Group only top-level regions (no parent)
   const grouped = {};
-  regions.filter(r => !r.parent).forEach(r => {
+  allRegions.filter(r => !r.parent).forEach(r => {
     if (!grouped[r.group]) grouped[r.group] = [];
     grouped[r.group].push(r);
   });

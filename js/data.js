@@ -20,11 +20,10 @@ const APP_DATA = {
     { name: '海外技術處', group: '台灣', color: 'gold', parent: '研發技術處' },
     { name: '製造處',     group: '台灣', color: 'gold', parent: '研發技術處' },
     // 中國宏全
-    { name: '中國宏全', group: '中國宏全', color: 'blue', parent: '' },
-    { name: '蘇州廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
-    { name: '清新廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
-    { name: '漳州廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
-    { name: '滁州廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
+    { name: '蘇州廠', group: '中國', color: 'blue', parent: '中國宏全' },
+    { name: '清新廠', group: '中國', color: 'blue', parent: '中國宏全' },
+    { name: '漳州廠', group: '中國', color: 'blue', parent: '中國宏全' },
+    { name: '滁州廠', group: '中國', color: 'blue', parent: '中國宏全' },
     // 東南亞總部
     { name: '東南亞總部', group: '東南亞總部', color: 'orange', parent: '' },
     { name: '越南',       group: '東南亞總部', color: 'orange', parent: '東南亞總部' },
