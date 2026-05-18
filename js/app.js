@@ -287,25 +287,32 @@ function renderDashboard(el) {
                 ${gUnits.length > 0 ? gUnits.map(u => {
                   const uCases = casesByUnit[u.unitName] || [];
                   return `
-                    <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:5px;cursor:default"
+                    <div style="padding:4px 8px 4px 8px;border-radius:5px;cursor:default"
                          onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                      <span style="font-size:12px;font-weight:500;color:var(--text);width:88px;flex-shrink:0;
-                                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-top:1px" title="${u.unitName}">${u.unitName}</span>
-                      <div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;min-width:0">
-                        ${uCases.length > 0 ? uCases.map(c => {
-                          const isPoc = c.stage === 'poc';
-                          const tagColor = isPoc ? '#f59e0b' : '#10b981';
-                          const tagBg   = isPoc ? '#fef3c7' : '#d1fae5';
-                          return `<span style="display:inline-flex;align-items:center;gap:3px;
-                                              font-size:10px;padding:2px 6px;border-radius:10px;
-                                              background:${tagBg};color:${tagColor};font-weight:500;
-                                              white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis"
-                                        title="${c.caseName}">
-                                    <span style="width:5px;height:5px;border-radius:50%;background:${tagColor};flex-shrink:0;display:inline-block"></span>
-                                    ${c.caseName}
-                                  </span>`;
-                        }).join('') : `<span style="font-size:11px;color:#cbd5e1">—</span>`}
+                      <div style="display:flex;align-items:center;gap:6px;margin-bottom:${uCases.length ? '4px' : '0'}">
+                        <span style="font-size:12px;font-weight:500;color:var(--text);
+                                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${u.unitName}">${u.unitName}</span>
+                        ${uCases.length === 0 ? `<span style="font-size:11px;color:#cbd5e1">—</span>` : ''}
                       </div>
+                      ${uCases.length > 0 ? `
+                        <div style="display:flex;flex-direction:column;gap:3px;padding-left:4px">
+                          ${uCases.map(c => {
+                            const isPoc = c.stage === 'poc';
+                            const dotColor = isPoc ? '#f59e0b' : '#10b981';
+                            const bgColor  = isPoc ? '#fffbeb' : '#f0fdf4';
+                            const textColor = isPoc ? '#92400e' : '#166534';
+                            return `
+                              <div style="display:flex;align-items:center;gap:6px;
+                                          padding:2px 7px;border-radius:5px;background:${bgColor}">
+                                <span style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0"></span>
+                                <span style="font-size:11px;font-weight:500;color:${textColor};flex:1;
+                                             overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                                      title="${c.caseName}">${c.caseName}</span>
+                                ${c.owner ? `<span style="font-size:10px;color:#94a3b8;flex-shrink:0;white-space:nowrap">${c.owner}</span>` : ''}
+                              </div>`;
+                          }).join('')}
+                        </div>
+                      ` : ''}
                     </div>
                   `;
                 }).join('') : `<div style="padding:6px 8px;font-size:12px;color:#94a3b8">尚無單位資料</div>`}
