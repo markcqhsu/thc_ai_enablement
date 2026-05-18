@@ -18,7 +18,7 @@ const APP_DATA = {
   // ── 單位 ──
   units: [
     {
-      id: 1, unitName: '企劃室', region: '台灣', factory: '總部',
+      id: 1, unitName: '企劃室', region: '台灣',
       aiContact: '林志豪', aiStaff: ['林志豪'], needSupport: false,
       maturityLevel: 'L5',
       pocItems: ['AI 戰情儀表板', 'OCR 整合工具'],
@@ -26,7 +26,7 @@ const APP_DATA = {
       dueDate: '2026-06-30', lastUpdated: '2026-05-16',
     },
     {
-      id: 2, unitName: '台灣無菌一廠', region: '台灣', factory: 'TW-F1',
+      id: 2, unitName: '台灣無菌一廠', region: '台灣',
       aiContact: '陳美玲', aiStaff: ['陳美玲'], needSupport: false,
       maturityLevel: 'L4',
       pocItems: ['瓶蓋 OCR 辨識'],
@@ -34,7 +34,7 @@ const APP_DATA = {
       dueDate: '2026-06-15', lastUpdated: '2026-05-12',
     },
     {
-      id: 3, unitName: '台灣無菌二廠', region: '台灣', factory: 'TW-F2',
+      id: 3, unitName: '台灣無菌二廠', region: '台灣',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -42,7 +42,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 4, unitName: '台灣無菌三廠', region: '台灣', factory: 'TW-F3',
+      id: 4, unitName: '台灣無菌三廠', region: '台灣',
       aiContact: '王大明', aiStaff: ['王大明', '李孟蘭'], needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['調撥單 OCR'],
@@ -50,7 +50,7 @@ const APP_DATA = {
       dueDate: '2026-05-31', lastUpdated: '2026-04-28',
     },
     {
-      id: 5, unitName: '台灣業務部', region: '台灣', factory: '總部',
+      id: 5, unitName: '台灣業務部', region: '台灣',
       aiContact: '李小雨', aiStaff: ['李小雨'], needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['客戶詢問自動回覆'],
@@ -58,7 +58,7 @@ const APP_DATA = {
       dueDate: '2026-07-15', lastUpdated: '2026-05-14',
     },
     {
-      id: 6, unitName: '蘇宏總部', region: '蘇宏總部', factory: 'CN-SZ',
+      id: 6, unitName: '蘇宏總部', region: '蘇宏總部',
       aiContact: '張偉', aiStaff: ['張偉'], needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['生產異常偵測'],
@@ -66,7 +66,7 @@ const APP_DATA = {
       dueDate: '2026-06-30', lastUpdated: '2026-05-08',
     },
     {
-      id: 7, unitName: '清新廠', region: '清新廠', factory: 'CN-QX',
+      id: 7, unitName: '清新廠', region: '清新廠',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -74,7 +74,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 8, unitName: '漳州廠', region: '漳州廠', factory: 'CN-ZZ',
+      id: 8, unitName: '漳州廠', region: '漳州廠',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -82,7 +82,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 9, unitName: '越南廠', region: '越南', factory: 'VN-F1',
+      id: 9, unitName: '越南廠', region: '越南',
       aiContact: 'Nguyen Van A', aiStaff: [], needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['多語言文件翻譯'],
@@ -90,7 +90,7 @@ const APP_DATA = {
       dueDate: '2026-06-15', lastUpdated: '2026-04-15',
     },
     {
-      id: 10, unitName: '泰國廠', region: '泰國', factory: 'TH-F1',
+      id: 10, unitName: '泰國廠', region: '泰國',
       aiContact: 'Somchai P.', aiStaff: [], needSupport: true,
       maturityLevel: 'L1',
       pocItems: [],
@@ -98,7 +98,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '2026-04-10',
     },
     {
-      id: 11, unitName: '馬來西亞廠', region: '馬來西亞', factory: 'MY-F1',
+      id: 11, unitName: '馬來西亞廠', region: '馬來西亞',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -106,7 +106,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 12, unitName: '緬甸廠', region: '緬甸', factory: 'MM-F1',
+      id: 12, unitName: '緬甸廠', region: '緬甸',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -114,7 +114,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 13, unitName: '印尼廠', region: '印尼', factory: 'ID-F1',
+      id: 13, unitName: '印尼廠', region: '印尼',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
