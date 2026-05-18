@@ -34,6 +34,17 @@ function bool(val) {
     : `<span style="color:#94a3b8">否</span>`;
 }
 
+// ── Region Accordion ──
+
+function toggleRegionChildren(name) {
+  const panel = document.getElementById(`region-children-${name}`);
+  const arrow = document.getElementById(`region-arrow-${name}`);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.textContent = isOpen ? '▸' : '▾';
+}
+
 // ── Navigation ──
 
 function toggleSidebar() {
@@ -91,9 +102,18 @@ function renderDashboard(el) {
   const apiTotalBudget = apiLatest.reduce((s, r) => s + r.budget_usd, 0);
   const apiOverCount = apiLatest.filter(r => r.cost_usd > r.budget_usd).length;
 
-  // Region groups
-  const grouped = {};
+  // Build parent-child map
+  const childrenOf = {};
   regions.forEach(r => {
+    if (r.parent) {
+      if (!childrenOf[r.parent]) childrenOf[r.parent] = [];
+      childrenOf[r.parent].push(r);
+    }
+  });
+
+  // Group only top-level regions (no parent)
+  const grouped = {};
+  regions.filter(r => !r.parent).forEach(r => {
     if (!grouped[r.group]) grouped[r.group] = [];
     grouped[r.group].push(r);
   });
@@ -218,15 +238,22 @@ function renderDashboard(el) {
               <div class="region-group-label">${group}</div>
               <div class="region-mini-grid">
                 ${rs.map(r => {
-                  const regionUnits = units.filter(u => u.region === r.name);
+                  const children = childrenOf[r.name] || [];
+                  const allNames = [r.name, ...children.map(c => c.name)];
+                  const regionUnits = units.filter(u => allNames.includes(u.region));
                   const active = regionUnits.filter(u => u.maturityLevel !== 'L0').length;
                   const topLevel = regionUnits.reduce((best, u) => {
                     const n = parseInt(u.maturityLevel.replace('L',''));
                     return n > parseInt(best.replace('L','')) ? u.maturityLevel : best;
                   }, 'L0');
+                  const hasChildren = children.length > 0;
                   return `
-                    <div class="region-mini-card region-card-${r.color}">
-                      <div class="region-mini-name">${r.name}</div>
+                    <div class="region-mini-card region-card-${r.color}${hasChildren ? ' has-children' : ''}"
+                      ${hasChildren ? `onclick="toggleRegionChildren('${r.name}')"` : ''}>
+                      <div class="region-mini-name">
+                        ${r.name}
+                        ${hasChildren ? `<span class="region-expand-arrow" id="region-arrow-${r.name}">▸</span>` : ''}
+                      </div>
                       <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
                         <span class="region-dot" style="background:${lv(topLevel).color}"></span>
                         <span style="font-size:11px;color:#64748b">${active}/${regionUnits.length} 單位</span>
@@ -235,6 +262,33 @@ function renderDashboard(el) {
                   `;
                 }).join('')}
               </div>
+              ${rs.filter(r => (childrenOf[r.name] || []).length > 0).map(r => {
+                const children = childrenOf[r.name];
+                return `
+                  <div id="region-children-${r.name}" class="region-children-panel" style="display:none">
+                    <div class="region-children-label">${r.name} 子單位</div>
+                    <div class="region-mini-grid">
+                      ${children.map(c => {
+                        const cUnits = units.filter(u => u.region === c.name);
+                        const cActive = cUnits.filter(u => u.maturityLevel !== 'L0').length;
+                        const cTop = cUnits.reduce((best, u) => {
+                          const n = parseInt(u.maturityLevel.replace('L',''));
+                          return n > parseInt(best.replace('L','')) ? u.maturityLevel : best;
+                        }, 'L0');
+                        return `
+                          <div class="region-mini-card region-card-${c.color} child-card">
+                            <div class="region-mini-name">${c.name}</div>
+                            <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
+                              <span class="region-dot" style="background:${lv(cTop).color}"></span>
+                              <span style="font-size:11px;color:#64748b">${cActive}/${cUnits.length} 單位</span>
+                            </div>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
             </div>
           `).join('')}
 

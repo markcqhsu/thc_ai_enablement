@@ -4,15 +4,32 @@ const APP_DATA = {
 
   // ── 地區 ──
   regions: [
-    { name: '台灣',     group: '台灣',     color: 'gold'   },
-    { name: '蘇宏總部', group: '中國宏全', color: 'yellow' },
-    { name: '清新廠',   group: '中國宏全', color: 'gray'   },
-    { name: '漳州廠',   group: '中國宏全', color: 'gray'   },
-    { name: '越南',     group: '東南亞總部', color: 'blue'   },
-    { name: '泰國',     group: '東南亞總部', color: 'lblue'  },
-    { name: '馬來西亞', group: '東南亞總部', color: 'gray'   },
-    { name: '緬甸',     group: '東南亞總部', color: 'gray'   },
-    { name: '印尼',     group: '東南亞總部', color: 'gray'   },
+    // 台灣 — 頂層
+    { name: '總管理處',   group: '台灣', color: 'purple', parent: '' },
+    { name: '研發技術處', group: '台灣', color: 'gold',   parent: '' },
+    { name: '台宏品保處', group: '台灣', color: 'gold',   parent: '' },
+    { name: '台灣無菌一廠', group: '台灣', color: 'teal', parent: '' },
+    { name: '台灣無菌二廠', group: '台灣', color: 'teal', parent: '' },
+    { name: '台灣無菌三廠', group: '台灣', color: 'teal', parent: '' },
+    { name: '台灣業務部', group: '台灣', color: 'sky',    parent: '' },
+    // 台灣 — 總管理處 子層
+    { name: 'AI策略與轉型部', group: '台灣', color: 'purple', parent: '總管理處' },
+    { name: '永續發展部',     group: '台灣', color: 'purple', parent: '總管理處' },
+    { name: '採購處',         group: '台灣', color: 'purple', parent: '總管理處' },
+    // 台灣 — 研發技術處 子層
+    { name: '海外技術處', group: '台灣', color: 'gold', parent: '研發技術處' },
+    { name: '製造處',     group: '台灣', color: 'gold', parent: '研發技術處' },
+    // 中國宏全
+    { name: '蘇宏總部', group: '中國宏全', color: 'blue', parent: '' },
+    { name: '清新廠',   group: '中國宏全', color: 'blue', parent: '' },
+    { name: '漳州廠',   group: '中國宏全', color: 'blue', parent: '' },
+    { name: '滁州廠',   group: '中國宏全', color: 'blue', parent: '' },
+    // 東南亞總部
+    { name: '越南',     group: '東南亞總部', color: 'orange', parent: '' },
+    { name: '泰國',     group: '東南亞總部', color: 'orange', parent: '' },
+    { name: '馬來西亞', group: '東南亞總部', color: 'orange', parent: '' },
+    { name: '緬甸',     group: '東南亞總部', color: 'orange', parent: '' },
+    { name: '印尼',     group: '東南亞總部', color: 'orange', parent: '' },
   ],
 
   // ── 單位 ──

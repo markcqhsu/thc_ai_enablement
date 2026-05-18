@@ -390,6 +390,34 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 .region-card-blue   { background: #eff6ff; border-color: #bfdbfe; }
 .region-card-lblue  { background: #f0f9ff; border-color: #bae6fd; }
 .region-card-gray   { background: #f8fafc; border-color: #e2e8f0; }
+.region-card-orange { background: #ffedd5; border-color: #fed7aa; }
+.region-card-teal   { background: #ccfbf1; border-color: #99f6e4; }
+.region-card-purple { background: #ede9fe; border-color: #ddd6fe; }
+.region-card-rose   { background: #ffe4e6; border-color: #fecdd3; }
+.region-card-mint   { background: #d1fae5; border-color: #a7f3d0; }
+.region-card-sky    { background: #e0f2fe; border-color: #bae6fd; }
+.region-card-sand   { background: #fef9c3; border-color: #fef08a; }
+.region-card-slate  { background: #f1f5f9; border-color: #cbd5e1; }
+
+/* ── Expandable Region Cards ── */
+.region-mini-card.has-children { cursor: pointer; }
+.region-mini-card.has-children:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); transform: translateY(-1px); }
+.region-expand-arrow { font-size: 10px; color: var(--text-muted); margin-left: 4px; display: inline-block; transition: transform 0.2s; }
+
+.region-children-panel {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  border-left: 3px solid #bfdbfe;
+}
+.region-children-label {
+  font-size: 10px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 8px;
+}
+.region-mini-card.child-card { opacity: 0.9; }
 
 /* ── Architecture Note ── */
 .arch-note {
