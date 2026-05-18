@@ -144,6 +144,13 @@ function renderDashboard(el) {
     rose:'#f43f5e', mint:'#10b981', sky:'#0ea5e9', sand:'#ca8a04', slate:'#64748b',
   };
 
+  // Map unitName → cases
+  const casesByUnit = {};
+  cases.forEach(c => {
+    if (!casesByUnit[c.unitName]) casesByUnit[c.unitName] = [];
+    casesByUnit[c.unitName].push(c);
+  });
+
   el.innerHTML = `
     <!-- KPI Row -->
     <div class="kpi-grid kpi-grid-4">
@@ -260,10 +267,12 @@ function renderDashboard(el) {
         <div class="card">
           <div class="card-title">各地區啟動狀況</div>
           ${groupOrder.map(group => {
-            const gUnits = (unitsByGroup[group] || []).slice().sort((a, b) =>
-              parseInt(b.maturityLevel.replace('L','')) - parseInt(a.maturityLevel.replace('L',''))
-            );
-            const activeCount = gUnits.filter(u => u.maturityLevel !== 'L0').length;
+            const gUnits = (unitsByGroup[group] || []).slice().sort((a, b) => {
+              const ac = (casesByUnit[a.unitName] || []).length;
+              const bc = (casesByUnit[b.unitName] || []).length;
+              return bc - ac;
+            });
+            const totalCases = gUnits.reduce((s, u) => s + (casesByUnit[u.unitName] || []).length, 0);
             const firstReg = allRegions.find(r => r.group === group);
             const groupColor = firstReg ? (colorHex[firstReg.color] || '#94a3b8') : '#94a3b8';
             return `
@@ -271,26 +280,32 @@ function renderDashboard(el) {
                 <div style="display:flex;align-items:center;justify-content:space-between;
                             padding:6px 10px;border-radius:6px;
                             background:${groupColor}18;border-left:3px solid ${groupColor};
-                            margin-bottom:6px">
+                            margin-bottom:4px">
                   <span style="font-size:12px;font-weight:600;color:${groupColor}">${group}</span>
-                  <span style="font-size:11px;color:#64748b">${activeCount} / ${gUnits.length} 已啟動</span>
+                  <span style="font-size:11px;color:#64748b">${totalCases} 個案例</span>
                 </div>
                 ${gUnits.length > 0 ? gUnits.map(u => {
-                  const cur = parseInt(u.maturityLevel.replace('L',''));
-                  const m = lv(u.maturityLevel);
+                  const uCases = casesByUnit[u.unitName] || [];
                   return `
-                    <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;cursor:default"
+                    <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:5px;cursor:default"
                          onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                      <span style="font-size:12px;font-weight:500;color:var(--text);width:96px;flex-shrink:0;
-                                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${u.unitName}">${u.unitName}</span>
-                      <div style="display:flex;align-items:center;gap:4px;flex:1">
-                        ${[0,1,2,3,4,5].map(l => {
-                          if (l < cur)  return `<span style="width:10px;height:10px;border-radius:50%;background:${m.color};opacity:0.3;display:inline-block;flex-shrink:0"></span>`;
-                          if (l === cur) return `<span style="width:13px;height:13px;border-radius:50%;background:${m.color};display:inline-block;flex-shrink:0;box-shadow:0 0 0 2px #fff,0 0 0 3.5px ${m.color}"></span>`;
-                          return `<span style="width:10px;height:10px;border-radius:50%;border:1.5px solid #cbd5e1;display:inline-block;flex-shrink:0"></span>`;
-                        }).join('')}
+                      <span style="font-size:12px;font-weight:500;color:var(--text);width:88px;flex-shrink:0;
+                                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-top:1px" title="${u.unitName}">${u.unitName}</span>
+                      <div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;min-width:0">
+                        ${uCases.length > 0 ? uCases.map(c => {
+                          const isPoc = c.stage === 'poc';
+                          const tagColor = isPoc ? '#f59e0b' : '#10b981';
+                          const tagBg   = isPoc ? '#fef3c7' : '#d1fae5';
+                          return `<span style="display:inline-flex;align-items:center;gap:3px;
+                                              font-size:10px;padding:2px 6px;border-radius:10px;
+                                              background:${tagBg};color:${tagColor};font-weight:500;
+                                              white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis"
+                                        title="${c.caseName}">
+                                    <span style="width:5px;height:5px;border-radius:50%;background:${tagColor};flex-shrink:0;display:inline-block"></span>
+                                    ${c.caseName}
+                                  </span>`;
+                        }).join('') : `<span style="font-size:11px;color:#cbd5e1">—</span>`}
                       </div>
-                      <span style="font-size:10px;font-weight:700;color:${m.color};width:22px;text-align:right;flex-shrink:0">${u.maturityLevel}</span>
                     </div>
                   `;
                 }).join('') : `<div style="padding:6px 8px;font-size:12px;color:#94a3b8">尚無單位資料</div>`}
@@ -299,12 +314,13 @@ function renderDashboard(el) {
           }).join('')}
 
           <!-- Legend -->
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
-            ${Object.entries(MATURITY_LEVELS).map(([k,v]) =>
-              `<span style="display:flex;align-items:center;gap:3px;font-size:11px;color:#64748b">
-                <span style="width:8px;height:8px;border-radius:50%;background:${v.color};display:inline-block"></span>${k} ${v.label}
-              </span>`
-            ).join('')}
+          <div style="display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9">
+            <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b">
+              <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>已完成
+            </span>
+            <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b">
+              <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block"></span>PoC 進行中
+            </span>
           </div>
         </div>
 
