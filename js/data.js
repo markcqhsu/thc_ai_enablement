@@ -43,7 +43,7 @@ const APP_DATA = {
     },
     {
       id: 4, unitName: '台灣無菌三廠', region: '台灣', factory: 'TW-F3',
-      aiContact: '王大明', aiStaff: [], needSupport: true,
+      aiContact: '王大明', aiStaff: ['王大明', '李孟蘭'], needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['調撥單 OCR'],
       estimatedBenefit: '縮短 30% 文件流程',
