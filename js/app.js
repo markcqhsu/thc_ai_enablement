@@ -128,6 +128,22 @@ function renderDashboard(el) {
     grouped[r.group].push(r);
   });
 
+  // Map region name → region object; group units by their region's group
+  const regionByName = {};
+  allRegions.forEach(r => { regionByName[r.name] = r; });
+  const unitsByGroup = {};
+  units.forEach(u => {
+    const r = regionByName[u.region];
+    const g = r ? r.group : null;
+    if (g) { if (!unitsByGroup[g]) unitsByGroup[g] = []; unitsByGroup[g].push(u); }
+  });
+  const groupOrder = Object.keys(grouped);
+  const colorHex = {
+    gold:'#f59e0b', yellow:'#eab308', blue:'#3b82f6', lblue:'#0ea5e9',
+    gray:'#94a3b8', orange:'#f97316', teal:'#14b8a6', purple:'#8b5cf6',
+    rose:'#f43f5e', mint:'#10b981', sky:'#0ea5e9', sand:'#ca8a04', slate:'#64748b',
+  };
+
   el.innerHTML = `
     <!-- KPI Row -->
     <div class="kpi-grid kpi-grid-4">
@@ -243,82 +259,44 @@ function renderDashboard(el) {
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="card">
           <div class="card-title">各地區啟動狀況</div>
-          ${Object.entries(grouped).map(([group, rs]) => `
-            <div class="region-group">
-              <div class="region-group-label">${group}</div>
-              <div class="region-mini-grid">
-                ${rs.map(r => {
-                  const children = childrenOf[r.name] || [];
-                  const allNames = [r.name, ...children.map(c => c.name)];
-                  const regionUnits = units.filter(u => allNames.includes(u.region));
-                  const active = regionUnits.filter(u => u.maturityLevel !== 'L0').length;
-                  const topLevel = regionUnits.reduce((best, u) => {
-                    const n = parseInt(u.maturityLevel.replace('L',''));
-                    return n > parseInt(best.replace('L','')) ? u.maturityLevel : best;
-                  }, 'L0');
-                  const hasChildren = children.length > 0;
-                  const pct = regionUnits.length > 0 ? Math.round(active / regionUnits.length * 100) : 0;
-                  const m = lv(topLevel);
+          ${groupOrder.map(group => {
+            const gUnits = (unitsByGroup[group] || []).slice().sort((a, b) =>
+              parseInt(b.maturityLevel.replace('L','')) - parseInt(a.maturityLevel.replace('L',''))
+            );
+            const activeCount = gUnits.filter(u => u.maturityLevel !== 'L0').length;
+            const firstReg = allRegions.find(r => r.group === group);
+            const groupColor = firstReg ? (colorHex[firstReg.color] || '#94a3b8') : '#94a3b8';
+            return `
+              <div style="margin-bottom:14px">
+                <div style="display:flex;align-items:center;justify-content:space-between;
+                            padding:6px 10px;border-radius:6px;
+                            background:${groupColor}18;border-left:3px solid ${groupColor};
+                            margin-bottom:6px">
+                  <span style="font-size:12px;font-weight:600;color:${groupColor}">${group}</span>
+                  <span style="font-size:11px;color:#64748b">${activeCount} / ${gUnits.length} 已啟動</span>
+                </div>
+                ${gUnits.length > 0 ? gUnits.map(u => {
+                  const cur = parseInt(u.maturityLevel.replace('L',''));
+                  const m = lv(u.maturityLevel);
                   return `
-                    <div class="region-mini-card region-card-${r.color}${hasChildren ? ' has-children' : ''}"
-                      ${hasChildren ? `onclick="toggleRegionChildren('${r.name}')"` : ''}>
-                      <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div class="region-mini-name">${r.name}</div>
-                        ${hasChildren ? `<span class="region-expand-arrow" id="region-arrow-${r.name}">▾</span>` : ''}
+                    <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;cursor:default"
+                         onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                      <span style="font-size:12px;font-weight:500;color:var(--text);width:96px;flex-shrink:0;
+                                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${u.unitName}">${u.unitName}</span>
+                      <div style="display:flex;align-items:center;gap:4px;flex:1">
+                        ${[0,1,2,3,4,5].map(l => {
+                          if (l < cur)  return `<span style="width:10px;height:10px;border-radius:50%;background:${m.color};opacity:0.3;display:inline-block;flex-shrink:0"></span>`;
+                          if (l === cur) return `<span style="width:13px;height:13px;border-radius:50%;background:${m.color};display:inline-block;flex-shrink:0;box-shadow:0 0 0 2px #fff,0 0 0 3.5px ${m.color}"></span>`;
+                          return `<span style="width:10px;height:10px;border-radius:50%;border:1.5px solid #cbd5e1;display:inline-block;flex-shrink:0"></span>`;
+                        }).join('')}
                       </div>
-                      ${regionUnits.length > 0 ? `
-                        <div style="margin-top:7px">
-                          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-                            <span style="font-size:10px;color:#64748b">推動中 <strong style="color:${m.color}">${active}</strong> / 共 ${regionUnits.length} 單位</span>
-                            <span style="font-size:9px;font-weight:700;color:#fff;background:${m.color};border-radius:3px;padding:1px 5px;letter-spacing:.3px">${topLevel}</span>
-                          </div>
-                          <div style="height:4px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden">
-                            <div style="width:${pct}%;height:100%;background:${m.color};border-radius:2px;transition:width .4s ease"></div>
-                          </div>
-                        </div>
-                      ` : `<div style="margin-top:6px;font-size:10px;color:#cbd5e1">尚無單位資料</div>`}
+                      <span style="font-size:10px;font-weight:700;color:${m.color};width:22px;text-align:right;flex-shrink:0">${u.maturityLevel}</span>
                     </div>
                   `;
-                }).join('')}
+                }).join('') : `<div style="padding:6px 8px;font-size:12px;color:#94a3b8">尚無單位資料</div>`}
               </div>
-              ${rs.filter(r => (childrenOf[r.name] || []).length > 0).map(r => {
-                const children = childrenOf[r.name];
-                return `
-                  <div id="region-children-${r.name}" class="region-children-panel" style="display:block">
-                    <div class="region-children-label">${r.name} 子單位</div>
-                    <div class="region-mini-grid">
-                      ${children.map(c => {
-                        const cUnits = units.filter(u => u.region === c.name);
-                        const cActive = cUnits.filter(u => u.maturityLevel !== 'L0').length;
-                        const cTop = cUnits.reduce((best, u) => {
-                          const n = parseInt(u.maturityLevel.replace('L',''));
-                          return n > parseInt(best.replace('L','')) ? u.maturityLevel : best;
-                        }, 'L0');
-                        const cm = lv(cTop);
-                        const cPct = cUnits.length > 0 ? Math.round(cActive / cUnits.length * 100) : 0;
-                        return `
-                          <div class="region-mini-card region-card-${c.color} child-card">
-                            <div class="region-mini-name" style="font-size:12px">${c.name}</div>
-                            ${cUnits.length > 0 ? `
-                              <div style="margin-top:6px">
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-                                  <span style="font-size:10px;color:#64748b">推動中 <strong style="color:${cm.color}">${cActive}</strong> / ${cUnits.length}</span>
-                                  <span style="font-size:9px;font-weight:700;color:#fff;background:${cm.color};border-radius:3px;padding:1px 4px">${cTop}</span>
-                                </div>
-                                <div style="height:3px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden">
-                                  <div style="width:${cPct}%;height:100%;background:${cm.color};border-radius:2px"></div>
-                                </div>
-                              </div>
-                            ` : `<div style="margin-top:5px;font-size:10px;color:#cbd5e1">尚無資料</div>`}
-                          </div>
-                        `;
-                      }).join('')}
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
 
           <!-- Legend -->
           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
