@@ -36,7 +36,7 @@ const APP_DATA = {
   // ── 單位 ──
   units: [
     {
-      id: 1, unitName: '企劃室', region: '台灣',
+      id: 1, unitName: '企劃室', region: '總管理處',
       aiContact: '林志豪', aiStaff: ['林志豪'], needSupport: false,
       maturityLevel: 'L5',
       pocItems: ['AI 戰情儀表板', 'OCR 整合工具'],
@@ -44,7 +44,7 @@ const APP_DATA = {
       dueDate: '2026-06-30', lastUpdated: '2026-05-16',
     },
     {
-      id: 2, unitName: '台灣無菌一廠', region: '台灣',
+      id: 2, unitName: '台灣無菌一廠', region: '台灣無菌一廠',
       aiContact: '陳美玲', aiStaff: ['陳美玲'], needSupport: false,
       maturityLevel: 'L4',
       pocItems: ['瓶蓋 OCR 辨識'],
@@ -52,7 +52,7 @@ const APP_DATA = {
       dueDate: '2026-06-15', lastUpdated: '2026-05-12',
     },
     {
-      id: 3, unitName: '台灣無菌二廠', region: '台灣',
+      id: 3, unitName: '台灣無菌二廠', region: '台灣無菌二廠',
       aiContact: '', aiStaff: [], needSupport: true,
       maturityLevel: 'L0',
       pocItems: [],
@@ -60,7 +60,7 @@ const APP_DATA = {
       dueDate: '', lastUpdated: '',
     },
     {
-      id: 4, unitName: '台灣無菌三廠', region: '台灣',
+      id: 4, unitName: '台灣無菌三廠', region: '台灣無菌三廠',
       aiContact: '王大明', aiStaff: ['王大明', '李孟蘭'], needSupport: true,
       maturityLevel: 'L2',
       pocItems: ['調撥單 OCR'],
@@ -68,7 +68,7 @@ const APP_DATA = {
       dueDate: '2026-05-31', lastUpdated: '2026-04-28',
     },
     {
-      id: 5, unitName: '台灣業務部', region: '台灣',
+      id: 5, unitName: '台灣業務部', region: '台灣業務部',
       aiContact: '李小雨', aiStaff: ['李小雨'], needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['客戶詢問自動回覆'],
@@ -76,7 +76,7 @@ const APP_DATA = {
       dueDate: '2026-07-15', lastUpdated: '2026-05-14',
     },
     {
-      id: 6, unitName: '蘇宏總部', region: '蘇宏總部',
+      id: 6, unitName: '蘇州廠', region: '蘇州廠',
       aiContact: '張偉', aiStaff: ['張偉'], needSupport: false,
       maturityLevel: 'L3',
       pocItems: ['生產異常偵測'],
