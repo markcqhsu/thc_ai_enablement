@@ -383,7 +383,7 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 .region-group:last-child { margin-bottom: 0; }
 .region-group-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
 .region-mini-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-.region-mini-card { padding: 8px 12px; border-radius: var(--r-sm); border: 1px solid var(--border); flex-shrink: 0; min-width: 90px; }
+.region-mini-card { padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--border); flex-shrink: 0; min-width: 120px; }
 .region-mini-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .region-card-gold   { background: #fef3c7; border-color: #fcd34d; }
 .region-card-yellow { background: #fffbeb; border-color: #fde68a; }

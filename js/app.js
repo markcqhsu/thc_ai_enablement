@@ -257,17 +257,26 @@ function renderDashboard(el) {
                     return n > parseInt(best.replace('L','')) ? u.maturityLevel : best;
                   }, 'L0');
                   const hasChildren = children.length > 0;
+                  const pct = regionUnits.length > 0 ? Math.round(active / regionUnits.length * 100) : 0;
+                  const m = lv(topLevel);
                   return `
                     <div class="region-mini-card region-card-${r.color}${hasChildren ? ' has-children' : ''}"
                       ${hasChildren ? `onclick="toggleRegionChildren('${r.name}')"` : ''}>
-                      <div class="region-mini-name">
-                        ${r.name}
+                      <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div class="region-mini-name">${r.name}</div>
                         ${hasChildren ? `<span class="region-expand-arrow" id="region-arrow-${r.name}">▾</span>` : ''}
                       </div>
-                      <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
-                        <span class="region-dot" style="background:${lv(topLevel).color}"></span>
-                        <span style="font-size:11px;color:#64748b">${active}/${regionUnits.length} 單位</span>
-                      </div>
+                      ${regionUnits.length > 0 ? `
+                        <div style="margin-top:7px">
+                          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                            <span style="font-size:10px;color:#64748b">推動中 <strong style="color:${m.color}">${active}</strong> / 共 ${regionUnits.length} 單位</span>
+                            <span style="font-size:9px;font-weight:700;color:#fff;background:${m.color};border-radius:3px;padding:1px 5px;letter-spacing:.3px">${topLevel}</span>
+                          </div>
+                          <div style="height:4px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden">
+                            <div style="width:${pct}%;height:100%;background:${m.color};border-radius:2px;transition:width .4s ease"></div>
+                          </div>
+                        </div>
+                      ` : `<div style="margin-top:6px;font-size:10px;color:#cbd5e1">尚無單位資料</div>`}
                     </div>
                   `;
                 }).join('')}
@@ -285,13 +294,22 @@ function renderDashboard(el) {
                           const n = parseInt(u.maturityLevel.replace('L',''));
                           return n > parseInt(best.replace('L','')) ? u.maturityLevel : best;
                         }, 'L0');
+                        const cm = lv(cTop);
+                        const cPct = cUnits.length > 0 ? Math.round(cActive / cUnits.length * 100) : 0;
                         return `
                           <div class="region-mini-card region-card-${c.color} child-card">
-                            <div class="region-mini-name">${c.name}</div>
-                            <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
-                              <span class="region-dot" style="background:${lv(cTop).color}"></span>
-                              <span style="font-size:11px;color:#64748b">${cActive}/${cUnits.length} 單位</span>
-                            </div>
+                            <div class="region-mini-name" style="font-size:12px">${c.name}</div>
+                            ${cUnits.length > 0 ? `
+                              <div style="margin-top:6px">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                                  <span style="font-size:10px;color:#64748b">推動中 <strong style="color:${cm.color}">${cActive}</strong> / ${cUnits.length}</span>
+                                  <span style="font-size:9px;font-weight:700;color:#fff;background:${cm.color};border-radius:3px;padding:1px 4px">${cTop}</span>
+                                </div>
+                                <div style="height:3px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden">
+                                  <div style="width:${cPct}%;height:100%;background:${cm.color};border-radius:2px"></div>
+                                </div>
+                              </div>
+                            ` : `<div style="margin-top:5px;font-size:10px;color:#cbd5e1">尚無資料</div>`}
                           </div>
                         `;
                       }).join('')}
