@@ -41,23 +41,29 @@ async function loadFromSheets() {
   // units
   const unitRows = toObjects(get(1));
   if (unitRows.length) {
-    APP_DATA.units = unitRows.map((u, i) => ({
+    const sheetsUnitNames = new Set(unitRows.map(r => r.unitName));
+    const kept = APP_DATA.units.filter(u => !sheetsUnitNames.has(u.unitName));
+    const mapped = unitRows.map((u, i) => ({
       id: i + 1, ...u,
       needSupport: toBool(u.needSupport),
       pocItems:    toArr(u.pocItems),
       aiStaff:     toArr(u.aiStaff),
     }));
+    APP_DATA.units = [...mapped, ...kept];
   }
 
-  // cases
+  // cases — merge: Sheets overrides by caseName, mock extras kept
   const caseRows = toObjects(get(2));
   if (caseRows.length) {
-    APP_DATA.cases = caseRows.map((c, i) => ({
+    const sheetsCaseNames = new Set(caseRows.map(r => r.caseName));
+    const keptCases = APP_DATA.cases.filter(c => !sheetsCaseNames.has(c.caseName));
+    const mappedCases = caseRows.map((c, i) => ({
       id: i + 1, ...c,
       isReplicable: toBool(c.isReplicable),
       toolsUsed:    toArr(c.toolsUsed),
       replicableTo: toArr(c.replicableTo),
     }));
+    APP_DATA.cases = [...mappedCases, ...keptCases];
   }
 
   // talents
