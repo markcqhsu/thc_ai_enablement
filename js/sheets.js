@@ -22,7 +22,7 @@ function toObjects(rows) {
 }
 
 const toBool = v => v === 'TRUE' || v === 'true' || v === '是';
-const toArr  = v => v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
+const toArr  = v => v ? v.split(/[,、]/).map(s => s.trim()).filter(Boolean) : [];
 const toNum  = v => parseFloat(v) || 0;
 
 async function loadFromSheets() {
