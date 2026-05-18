@@ -128,20 +128,15 @@ function renderDashboard(el) {
     grouped[r.group].push(r);
   });
 
-  // Map region name → region object; group units by their region's group
-  const regionByName = {};
-  allRegions.forEach(r => { regionByName[r.name] = r; });
+  // Group units directly by unit.region (no regions-table lookup needed)
   const unitsByGroup = {};
   units.forEach(u => {
-    const r = regionByName[u.region];
-    const g = r ? r.group : null;
+    const g = u.region;
     if (g) { if (!unitsByGroup[g]) unitsByGroup[g] = []; unitsByGroup[g].push(u); }
   });
-  const groupOrder = Object.keys(grouped);
-  const colorHex = {
-    gold:'#f59e0b', yellow:'#eab308', blue:'#3b82f6', lblue:'#0ea5e9',
-    gray:'#94a3b8', orange:'#f97316', teal:'#14b8a6', purple:'#8b5cf6',
-    rose:'#f43f5e', mint:'#10b981', sky:'#0ea5e9', sand:'#ca8a04', slate:'#64748b',
+  const groupOrder = Object.keys(unitsByGroup);
+  const groupColorMap = {
+    '台灣': '#f59e0b', '中國': '#3b82f6', '東南亞總部': '#f43f5e',
   };
 
   // Map unitName → cases
@@ -273,8 +268,7 @@ function renderDashboard(el) {
               return bc - ac;
             });
             const totalCases = gUnits.reduce((s, u) => s + (casesByUnit[u.unitName] || []).length, 0);
-            const firstReg = allRegions.find(r => r.group === group);
-            const groupColor = firstReg ? (colorHex[firstReg.color] || '#94a3b8') : '#94a3b8';
+            const groupColor = groupColorMap[group] || '#94a3b8';
             return `
               <div style="margin-bottom:14px">
                 <div style="display:flex;align-items:center;justify-content:space-between;
