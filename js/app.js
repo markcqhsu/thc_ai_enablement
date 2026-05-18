@@ -216,7 +216,10 @@ function renderDashboard(el) {
             <div class="msummary-row">
               <span class="msummary-label">
                 <span class="level-badge" style="background:${l.color};font-size:10px;width:24px;height:24px">${l.level}</span>
-                <span class="msummary-name">${l.label}</span>
+                <span>
+                  <span class="msummary-name">${l.label}</span>
+                  <span style="display:block;font-size:10px;color:#94a3b8;font-weight:400;margin-top:1px">${l.desc}</span>
+                </span>
               </span>
               <div class="msummary-bar-wrap">
                 <div class="msummary-bar" style="width:${l.count ? (l.count/maxCount)*100 : 0}%;background:${l.color}"></div>
