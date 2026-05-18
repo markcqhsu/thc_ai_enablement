@@ -302,7 +302,10 @@ function renderDashboard(el) {
                                 <span style="font-size:11px;font-weight:500;color:${textColor};flex:1;
                                              overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
                                       title="${c.caseName}">${c.caseName}</span>
-                                ${c.owner ? `<span style="font-size:10px;color:#94a3b8;flex-shrink:0;white-space:nowrap">${c.owner}</span>` : ''}
+                                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+                                  ${c.owner ? `<span style="font-size:10px;color:#94a3b8;white-space:nowrap">${c.owner}</span>` : ''}
+                                  ${c.devUnit ? `<span style="font-size:9px;color:#fff;background:#6366f1;border-radius:3px;padding:1px 4px;white-space:nowrap">協作</span>` : ''}
+                                </div>
                               </div>`;
                           }).join('')}
                         </div>
@@ -504,7 +507,13 @@ function caseCards(list) {
             </div>`
           : `<span style="font-size:11px;color:#94a3b8">尚未評估複製性</span>`}
       </div>
-      <div style="font-size:11px;color:#94a3b8;margin-top:8px">負責人：${c.owner} · ${c.lastUpdated}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:4px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#94a3b8">
+          ${c.owner ? `<span>負責人：<span style="color:#64748b;font-weight:500">${c.owner}</span></span>` : ''}
+          ${c.devUnit ? `<span style="color:#cbd5e1">|</span><span>協作開發：<span style="color:#6366f1;font-weight:500">${c.devUnit}</span></span>` : ''}
+        </div>
+        <span style="font-size:11px;color:#94a3b8">${c.lastUpdated}</span>
+      </div>
     </div>
   `).join('');
 }
