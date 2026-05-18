@@ -252,7 +252,7 @@ function renderDashboard(el) {
                       ${hasChildren ? `onclick="toggleRegionChildren('${r.name}')"` : ''}>
                       <div class="region-mini-name">
                         ${r.name}
-                        ${hasChildren ? `<span class="region-expand-arrow" id="region-arrow-${r.name}">▸</span>` : ''}
+                        ${hasChildren ? `<span class="region-expand-arrow" id="region-arrow-${r.name}">▾</span>` : ''}
                       </div>
                       <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
                         <span class="region-dot" style="background:${lv(topLevel).color}"></span>
@@ -265,7 +265,7 @@ function renderDashboard(el) {
               ${rs.filter(r => (childrenOf[r.name] || []).length > 0).map(r => {
                 const children = childrenOf[r.name];
                 return `
-                  <div id="region-children-${r.name}" class="region-children-panel" style="display:none">
+                  <div id="region-children-${r.name}" class="region-children-panel" style="display:block">
                     <div class="region-children-label">${r.name} 子單位</div>
                     <div class="region-mini-grid">
                       ${children.map(c => {
@@ -489,7 +489,7 @@ function caseCards(list) {
 // ── Talent ──
 
 function renderTalent(el) {
-  const { talents, units, training, training_records } = APP_DATA;
+  const { talents, units, training, training_records, cases } = APP_DATA;
 
   const seedCount = talents.filter(t => t.isSeed).length;
   const regions = [...new Set(talents.map(t => t.region))];
@@ -548,6 +548,20 @@ function renderTalent(el) {
               <div class="skill-tags">
                 ${t.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}
               </div>
+
+              ${(() => {
+                const myCases = cases.filter(c => c.owner === t.name);
+                if (!myCases.length) return '';
+                return `
+                  <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">負責專案</div>
+                    ${myCases.map(c => `
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:5px">
+                        ${stageTag(c.stage)}
+                        <span style="flex:1;color:var(--text)">${c.caseName}</span>
+                      </div>`).join('')}
+                  </div>`;
+              })()}
 
               ${(() => {
                 const myRecords = training_records.filter(r => r.name === t.name);

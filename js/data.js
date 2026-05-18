@@ -5,31 +5,33 @@ const APP_DATA = {
   // ── 地區 ──
   regions: [
     // 台灣 — 頂層
-    { name: '總管理處',   group: '台灣', color: 'purple', parent: '' },
-    { name: '研發技術處', group: '台灣', color: 'gold',   parent: '' },
-    { name: '台宏品保處', group: '台灣', color: 'gold',   parent: '' },
-    { name: '台灣無菌一廠', group: '台灣', color: 'teal', parent: '' },
-    { name: '台灣無菌二廠', group: '台灣', color: 'teal', parent: '' },
-    { name: '台灣無菌三廠', group: '台灣', color: 'teal', parent: '' },
-    { name: '台灣業務部', group: '台灣', color: 'sky',    parent: '' },
+    { name: '總管理處',     group: '台灣', color: 'purple', parent: '' },
+    { name: '研發技術處',   group: '台灣', color: 'gold',   parent: '' },
+    { name: '台宏品保處',   group: '台灣', color: 'gold',   parent: '' },
+    { name: '台灣無菌一廠', group: '台灣', color: 'gold',   parent: '' },
+    { name: '台灣無菌二廠', group: '台灣', color: 'gold',   parent: '' },
+    { name: '台灣無菌三廠', group: '台灣', color: 'gold',   parent: '' },
+    { name: '台灣業務部',   group: '台灣', color: 'gold',   parent: '' },
     // 台灣 — 總管理處 子層
-    { name: 'AI策略與轉型部', group: '台灣', color: 'purple', parent: '總管理處' },
-    { name: '永續發展部',     group: '台灣', color: 'purple', parent: '總管理處' },
-    { name: '採購處',         group: '台灣', color: 'purple', parent: '總管理處' },
+    { name: 'AI策略與轉型部', group: '台灣', color: 'sand', parent: '總管理處' },
+    { name: '永續發展部',     group: '台灣', color: 'gold', parent: '總管理處' },
+    { name: '採購處',         group: '台灣', color: 'gold', parent: '總管理處' },
     // 台灣 — 研發技術處 子層
     { name: '海外技術處', group: '台灣', color: 'gold', parent: '研發技術處' },
     { name: '製造處',     group: '台灣', color: 'gold', parent: '研發技術處' },
     // 中國宏全
-    { name: '蘇宏總部', group: '中國宏全', color: 'blue', parent: '' },
-    { name: '清新廠',   group: '中國宏全', color: 'blue', parent: '' },
-    { name: '漳州廠',   group: '中國宏全', color: 'blue', parent: '' },
-    { name: '滁州廠',   group: '中國宏全', color: 'blue', parent: '' },
+    { name: '中國宏全', group: '中國宏全', color: 'blue', parent: '' },
+    { name: '蘇州廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
+    { name: '清新廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
+    { name: '漳州廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
+    { name: '滁州廠',   group: '中國宏全', color: 'blue', parent: '中國宏全' },
     // 東南亞總部
-    { name: '越南',     group: '東南亞總部', color: 'orange', parent: '' },
-    { name: '泰國',     group: '東南亞總部', color: 'orange', parent: '' },
-    { name: '馬來西亞', group: '東南亞總部', color: 'orange', parent: '' },
-    { name: '緬甸',     group: '東南亞總部', color: 'orange', parent: '' },
-    { name: '印尼',     group: '東南亞總部', color: 'orange', parent: '' },
+    { name: '東南亞總部', group: '東南亞總部', color: 'orange', parent: '' },
+    { name: '越南',       group: '東南亞總部', color: 'orange', parent: '東南亞總部' },
+    { name: '泰國',       group: '東南亞總部', color: 'teal',   parent: '東南亞總部' },
+    { name: '馬來西亞',   group: '東南亞總部', color: 'purple', parent: '東南亞總部' },
+    { name: '緬甸',       group: '東南亞總部', color: 'rose',   parent: '東南亞總部' },
+    { name: '印尼',       group: '東南亞總部', color: 'mint',   parent: '東南亞總部' },
   ],
 
   // ── 單位 ──

@@ -30,10 +30,12 @@ async function loadFromSheets() {
   const results = await Promise.allSettled(TABS.map(t => fetchTab(t)));
   const get = i => (results[i].status === 'fulfilled' ? results[i].value : []);
 
-  // regions
+  // regions — merge by name: Sheets entries override matching mock rows, extras kept
   const regRows = toObjects(get(0));
   if (regRows.length) {
-    APP_DATA.regions = regRows;
+    const sheetsNames = new Set(regRows.map(r => r.name));
+    const kept = APP_DATA.regions.filter(r => !sheetsNames.has(r.name));
+    APP_DATA.regions = [...regRows, ...kept];
   }
 
   // units
