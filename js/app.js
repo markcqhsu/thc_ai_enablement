@@ -213,18 +213,18 @@ function renderDashboard(el) {
         <!-- Summary bars -->
         <div class="maturity-summary">
           ${levelCounts.map(l => `
-            <div style="margin-bottom:6px">
-              <div class="msummary-row">
-                <span class="msummary-label">
-                  <span class="level-badge" style="background:${l.color};font-size:10px;width:24px;height:24px">${l.level}</span>
-                  <span class="msummary-name">${l.label}</span>
-                </span>
-                <div class="msummary-bar-wrap">
+            <div class="msummary-row" style="margin-bottom:8px">
+              <span class="msummary-label">
+                <span class="level-badge" style="background:${l.color};font-size:10px;width:24px;height:24px">${l.level}</span>
+                <span class="msummary-name">${l.label}</span>
+              </span>
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <div class="msummary-bar-wrap" style="margin:0">
                   <div class="msummary-bar" style="width:${l.count ? (l.count/maxCount)*100 : 0}%;background:${l.color}"></div>
                 </div>
-                <span class="msummary-count">${l.count} 單位</span>
+                <div style="font-size:10px;color:#94a3b8">${l.desc}</div>
               </div>
-              <div style="font-size:10px;color:#94a3b8;padding-left:110px;margin-top:2px">${l.desc}</div>
+              <span class="msummary-count">${l.count} 單位</span>
             </div>
           `).join('')}
         </div>
