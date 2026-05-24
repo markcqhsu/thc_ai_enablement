@@ -5,6 +5,7 @@ const PAGE_TITLES = {
   talent:    'AI 人才網路',
   training:  '課程安排',
   api:       'API 用量管理',
+  changelog: '修改記錄',
 };
 
 // ── Helpers ──
@@ -74,6 +75,7 @@ function navigate(page) {
     case 'talent':    renderTalent(content);    break;
     case 'training':  renderTraining(content);  break;
     case 'api':       renderApiUsage(content);  break;
+    case 'changelog': renderChangelog(content); break;
   }
 }
 
@@ -147,6 +149,27 @@ function renderDashboard(el) {
   });
 
   el.innerHTML = `
+    <!-- Mission Statement -->
+    <div style="
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    ">
+      <span style="font-size: 22px; flex-shrink: 0;">💡</span>
+      <p style="
+        margin: 0;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 1.7;
+        letter-spacing: 0.02em;
+      ">AI 推動的目的，不是讓所有人都會開發，而是讓每個單位都能被 AI 支援。</p>
+    </div>
+
     <!-- KPI Row -->
     <div class="kpi-grid kpi-grid-4">
       <div class="kpi-card green">
@@ -897,6 +920,208 @@ function renderApiUsage(el) {
             </tr>`).join('')}
         </tbody>
       </table>
+    </div>
+  `;
+}
+
+// ── Changelog ──
+
+const CHANGELOG = [
+  {
+    version: 'v2.6.0',
+    date: '2026-05-25',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: [
+      '首頁新增使命標語：「AI 推動的目的，不是讓所有人都會開發，而是讓每個單位都能被 AI 支援。」',
+      '新增修改記錄頁（本頁），方便追蹤每個版本的修改內容',
+    ],
+  },
+  {
+    version: 'v2.5.9',
+    date: '2026-05-24',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: ['改以 inline styles 重寫成熟度摘要列，修正說明文字排版異常'],
+  },
+  {
+    version: 'v2.5.8',
+    date: '2026-05-24',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: ['修正成熟度說明文字排版：desc 移至 bar 欄內，align-items 改為 flex-start'],
+  },
+  {
+    version: 'v2.5.7',
+    date: '2026-05-24',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: ['成熟度進度條下方顯示說明文字，修正版面'],
+  },
+  {
+    version: 'v2.5.6',
+    date: '2026-05-24',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: ['更新各成熟度等級說明文字', '在矩陣摘要中顯示成熟度描述'],
+  },
+  {
+    version: 'v2.5.5',
+    date: '2026-05-23',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: ['案例頁與地區狀態面板新增顯示開發單位（devUnit）'],
+  },
+  {
+    version: 'v2.5.4',
+    date: '2026-05-23',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: ['Dashboard 單位改直接依 unit.region 分組，不再經由 regions 表查找'],
+  },
+  {
+    version: 'v2.5.3',
+    date: '2026-05-23',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: ['地區案例列表改為橫向排版，加入階段顏色標示與負責人姓名'],
+  },
+  {
+    version: 'v2.5.2',
+    date: '2026-05-22',
+    tag: '資料',
+    tagColor: '#8b5cf6',
+    items: ['清除所有 mock 資料，Google Sheets 成為唯一資料來源'],
+  },
+  {
+    version: 'v2.5.1',
+    date: '2026-05-22',
+    tag: '資料',
+    tagColor: '#8b5cf6',
+    items: ['單位與案例改為 merge 策略：保留 Sheets 中不存在的本地項目'],
+  },
+  {
+    version: 'v2.5.0',
+    date: '2026-05-21',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: ['各地區啟動狀況改為顯示執行中案例名稱'],
+  },
+  {
+    version: 'v2.4.0',
+    date: '2026-05-20',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: ['地區啟動狀況改版：每單位顯示 6 點成熟度追蹤器'],
+  },
+  {
+    version: 'v2.3.0',
+    date: '2026-05-19',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: ['地區卡片 UX 優化：進度條 + 成熟度 badge 取代 X/Y 單位計數'],
+  },
+  {
+    version: 'v2.2.1',
+    date: '2026-05-18',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: ['修正 units.region 與 regions.name 對齊，確保 dashboard 計數正確'],
+  },
+  {
+    version: 'v2.2.0',
+    date: '2026-05-17',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: ['人才頁顯示負責專案', '地區子單位預設展開', 'regions 資料結構對齊 Sheets'],
+  },
+  {
+    version: 'v2.1.0',
+    date: '2026-05-16',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: ['地區支援階層展開式子卡片'],
+  },
+];
+
+function renderChangelog(el) {
+  const tagStyles = (color) => `
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:99px;
+    font-size:11px;
+    font-weight:600;
+    color:#fff;
+    background:${color};
+    vertical-align:middle;
+    margin-left:10px;
+  `;
+
+  el.innerHTML = `
+    <div class="card" style="max-width:780px;margin:0 auto">
+      <div style="margin-bottom:28px">
+        <div class="card-title" style="font-size:18px;margin-bottom:6px">📋 修改記錄</div>
+        <p style="color:var(--text-muted);font-size:13px;margin:0">
+          記錄每個版本的功能新增、問題修復與優化項目。
+        </p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0">
+        ${CHANGELOG.map((entry, idx) => `
+          <div style="
+            display:flex;
+            gap:0;
+            position:relative;
+          ">
+            <!-- Timeline line -->
+            <div style="
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              width:40px;
+              flex-shrink:0;
+            ">
+              <div style="
+                width:12px;height:12px;
+                border-radius:50%;
+                background:${idx === 0 ? '#2563eb' : 'var(--border)'};
+                border:2px solid ${idx === 0 ? '#2563eb' : 'var(--border)'};
+                margin-top:18px;
+                flex-shrink:0;
+                z-index:1;
+              "></div>
+              ${idx < CHANGELOG.length - 1 ? `<div style="
+                width:2px;flex:1;
+                background:var(--border);
+                margin-top:2px;
+              "></div>` : ''}
+            </div>
+
+            <!-- Content -->
+            <div style="
+              flex:1;
+              padding:12px 0 28px 16px;
+            ">
+              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+                <span style="
+                  font-size:15px;font-weight:700;
+                  color:${idx === 0 ? '#2563eb' : 'var(--text)'};
+                ">${entry.version}</span>
+                <span style="${tagStyles(entry.tagColor)}">${entry.tag}</span>
+                <span style="font-size:12px;color:var(--text-muted);margin-left:auto">${entry.date}</span>
+              </div>
+              <ul style="
+                margin:0;padding-left:18px;
+                display:flex;flex-direction:column;gap:5px;
+              ">
+                ${entry.items.map(item => `
+                  <li style="font-size:13px;color:var(--text-muted);line-height:1.6">${item}</li>
+                `).join('')}
+              </ul>
+            </div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }
