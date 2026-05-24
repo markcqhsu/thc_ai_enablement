@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<title>網站架構與設計邏輯</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; padding: 32px; max-width: 960px; }
+
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #64748b; margin-bottom: 36px; }
+
+.section { margin-bottom: 40px; }
+.section-title {
+  font-size: 15px; font-weight: 700; margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;
+  display: flex; align-items: center; gap: 8px;
+}
+.num {
+  width: 24px; height: 24px; border-radius: 50%; background: #2563eb;
+  color: #fff; font-size: 12px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+/* ── Tech stack pills ── */
+.stack-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+.stack-pill {
+  border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+.sp-html    { background: #fff3e0; color: #bf360c; }
+.sp-css     { background: #e3f2fd; color: #0d47a1; }
+.sp-js      { background: #fffde7; color: #827717; }
+.sp-sheets  { background: #e8f5e9; color: #1b5e20; }
+.sp-github  { background: #f3e5f5; color: #4a148c; }
+.sp-icon { font-size: 16px; }
+
+/* ── File tree ── */
+.tree { background: #1e293b; color: #e2e8f0; border-radius: 10px; padding: 20px 24px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 2; }
+.tree-dir  { color: #93c5fd; }
+.tree-file { color: #e2e8f0; }
+.tree-note { color: #64748b; margin-left: 8px; font-size: 11px; }
+.tree-indent { margin-left: 20px; display: block; }
+
+/* ── Flow boxes ── */
+.flow-row { display: flex; align-items: stretch; gap: 0; margin: 20px 0; flex-wrap: wrap; }
+.flow-box {
+  border-radius: 10px; padding: 14px 18px; font-size: 12px; flex: 1; min-width: 140px;
+  border: 1.5px solid transparent;
+}
+.flow-arrow {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; flex-shrink: 0; font-size: 18px; color: #94a3b8;
+}
+.fb-sheets   { background: #f0fdf4; border-color: #86efac; }
+.fb-sheetsjs { background: #eff6ff; border-color: #93c5fd; }
+.fb-appdata  { background: #fefce8; border-color: #fde047; }
+.fb-appjs    { background: #f5f3ff; border-color: #c4b5fd; }
+.fb-dom      { background: #fff1f2; border-color: #fda4af; }
+.flow-box strong { display: block; font-size: 13px; margin-bottom: 4px; }
+.flow-box small  { color: #64748b; line-height: 1.6; display: block; }
+
+/* ── Init sequence ── */
+.seq { display: flex; flex-direction: column; gap: 0; }
+.seq-step {
+  display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+  border-left: 2px solid #e2e8f0; margin-left: 10px; padding-left: 20px; position: relative;
+}
+.seq-step::before {
+  content: attr(data-n);
+  position: absolute; left: -11px; top: 12px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #2563eb; color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.seq-step:last-child { border-left-color: transparent; }
+.seq-label { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.seq-desc  { font-size: 12px; color: #64748b; line-height: 1.6; }
+code { background: #f1f5f9; border-radius: 4px; padding: 1px 5px; font-family: monospace; font-size: 11px; color: #1e293b; }
+
+/* ── SPA routing ── */
+.nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 8px; }
+.nav-cell {
+  border-radius: 8px; padding: 10px; text-align: center; font-size: 12px;
+  border: 1.5px solid #e2e8f0; background: #fff;
+}
+.nav-cell .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.nav-cell .name { font-weight: 600; }
+.nav-cell .fn   { color: #64748b; font-size: 10px; font-family: monospace; margin-top: 3px; }
+
+/* ── CSS components ── */
+table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff;
+        border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+thead { background: #f1f5f9; }
+th { padding: 10px 14px; text-align: left; font-size: 12px; color: #475569; font-weight: 600; }
+td { padding: 9px 14px; border-top: 1px solid #f1f5f9; vertical-align: top; font-size: 13px; }
+tr:hover td { background: #fafafa; }
+
+.tag { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 500; margin-right: 3px; }
+.tg-blue   { background: #dbeafe; color: #1e40af; }
+.tg-green  { background: #dcfce7; color: #166534; }
+.tg-purple { background: #ede9fe; color: #4c1d95; }
+.tg-gray   { background: #f1f5f9; color: #475569; }
+
+/* ── Design decisions ── */
+.decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.decision-card {
+  background: #fff; border-radius: 10px; padding: 16px;
+  border: 1.5px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.decision-card .q { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+.decision-card .a { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.decision-card .why { font-size: 12px; color: #475569; line-height: 1.6; }
+
+@media (max-width: 680px) {
+  .decision-grid { grid-template-columns: 1fr; }
+  .nav-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media print {
+  body { background: white; padding: 16px; }
+  table { box-shadow: none; border: 1px solid #e2e8f0; }
+}
+</style>
+</head>
+<body>
+
+<h1>網站架構與設計邏輯</h1>
+<p class="subtitle">宏全集團 AI 推動管理系統 · v2.0.0</p>
+
+<!-- 1. Tech Stack -->
+<div class="section">
+  <div class="section-title"><span class="num">1</span> 技術選型</div>
+  <div class="stack-row">
+    <div class="stack-pill sp-html"><span class="sp-icon">🌐</span> HTML5 — 單一入口 index.html</div>
+    <div class="stack-pill sp-css"><span class="sp-icon">🎨</span> 純 CSS — 無框架，手寫 Design System</div>
+    <div class="stack-pill sp-js"><span class="sp-icon">⚡</span> Vanilla JS — 無打包工具，無 npm</div>
+    <div class="stack-pill sp-sheets"><span class="sp-icon">📊</span> Google Sheets API v4 — 唯讀資料庫</div>
+    <div class="stack-pill sp-github"><span class="sp-icon">🚀</span> GitHub Pages — 零成本靜態托管</div>
+  </div>
+  <p style="font-size:12px;color:#64748b;margin-top:8px">沒有 Node.js、沒有 bundler、沒有後端。開啟 index.html 本機就能跑；push 到 GitHub 即自動上線。</p>
+</div>
+
+<!-- 2. File Structure -->
+<div class="section">
+  <div class="section-title"><span class="num">2</span> 檔案結構</div>
+  <div class="tree">
+    <span class="tree-dir">thc_ai_enablement/</span>
+    <span class="tree-indent"><span class="tree-file">index.html</span><span class="tree-note">— HTML 骨架，sidebar + content 容器，載入三支 JS</span></span>
+    <span class="tree-indent">
+      <span class="tree-dir">css/</span>
+      <span class="tree-indent"><span class="tree-file">style.css</span><span class="tree-note">— 全站樣式，包含所有元件 class</span></span>
+    </span>
+    <span class="tree-indent">
+      <span class="tree-dir">js/</span>
+      <span class="tree-indent"><span class="tree-file">data.js</span><span class="tree-note">— Mock 資料 + MATURITY_LEVELS 常數（Sheets 讀不到時的 fallback）</span></span>
+      <span class="tree-indent"><span class="tree-file">sheets.js</span><span class="tree-note">— 讀取 Google Sheets，覆寫 APP_DATA</span></span>
+      <span class="tree-indent"><span class="tree-file">app.js</span><span class="tree-note">— SPA 路由 + 五頁渲染邏輯</span></span>
+    </span>
+    <span class="tree-indent">
+      <span class="tree-dir">docs/</span>
+      <span class="tree-indent"><span class="tree-file">data-map.html</span><span class="tree-note">— Sheets ↔ Dashboard 對照文件</span></span>
+      <span class="tree-indent"><span class="tree-file">architecture.html</span><span class="tree-note">— 本文件</span></span>
+    </span>
+  </div>
+</div>
+
+<!-- 3. Data Flow -->
+<div class="section">
+  <div class="section-title"><span class="num">3</span> 資料流</div>
+  <div class="flow-row">
+    <div class="flow-box fb-sheets">
+      <strong>Google Sheets</strong>
+      <small>6 個分頁<br>regions / units / cases<br>talents / training / updates</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-sheetsjs">
+      <strong>sheets.js</strong>
+      <small>Sheets API v4 (唯讀)<br>Promise.allSettled 並行讀取<br>型別轉換後覆寫 APP_DATA</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-appdata">
+      <strong>APP_DATA</strong>
+      <small>全域物件<br>初始值來自 data.js<br>Sheets 讀取成功後被覆寫</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-appjs">
+      <strong>app.js</strong>
+      <small>renderDashboard /<br>renderUnits / renderCases<br>renderTalent / renderTraining</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-dom">
+      <strong>DOM</strong>
+      <small>innerHTML 直接注入<br>#content 容器<br>無 Virtual DOM</small>
+    </div>
+  </div>
+
+  <p style="font-size:12px;color:#64748b;">
+    <strong>型別轉換規則：</strong>
+    逗號字串 → Array（pocItems, toolsUsed, skills, participants…）；
+    TRUE/true/是 → Boolean（needSupport, isReplicable, isSeed）；
+    parseFloat → Number（enrolled, capacity）
+  </p>
+</div>
+
+<!-- 4. Init Sequence -->
+<div class="section">
+  <div class="section-title"><span class="num">4</span> 啟動流程</div>
+  <div class="seq">
+    <div class="seq-step" data-n="1">
+      <div>
+        <div class="seq-label">browser 載入 index.html</div>
+        <div class="seq-desc">依序執行 <code>data.js</code> → <code>sheets.js</code> → <code>app.js</code>（&lt;script&gt; 順序）<br>
+        data.js 先建立含 mock 資料的 <code>APP_DATA</code> 與 <code>MATURITY_LEVELS</code></div>
+      </div>
+    </div>
+    <div class="seq-step" data-n="2">
+      <div>
+        <div class="seq-label">app.js 最後一行呼叫 <code>init()</code></div>
+        <div class="seq-desc">#content 顯示「載入資料中…」loading 畫面</div>
+      </div>
+    </div>
+    <div class="seq-step" data-n="3">
+      <div>
+        <div class="seq-label"><code>loadFromSheets()</code> 並行讀取 6 個分頁</div>
+        <div class="seq-desc">使用 <code>Promise.allSettled</code>：任一分頁失敗不影響其他分頁；<br>
+        成功的分頁覆寫 APP_DATA 對應欄位，失敗的保留 mock 資料</div>
+      </div>
+    </div>
+    <div class="seq-step" data-n="4">
+      <div>
+        <div class="seq-label">更新右上角日期標籤</div>
+        <div class="seq-desc">Sheets 成功 → 顯示今日日期；失敗 → 顯示「本地資料」</div>
+      </div>
+    </div>
+    <div class="seq-step" data-n="5">
+      <div>
+        <div class="seq-label"><code>navigate('dashboard')</code> 渲染首頁</div>
+        <div class="seq-desc">sidebar 高亮第一個 nav-item，<code>renderDashboard()</code> 將 HTML 注入 #content</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. SPA Routing -->
+<div class="section">
+  <div class="section-title"><span class="num">5</span> SPA 路由設計</div>
+  <p style="font-size:13px;color:#475569;margin-bottom:14px">
+    沒有 URL hash / History API。Sidebar 每個 <code>&lt;a&gt;</code> 直接呼叫 <code>navigate('頁面名稱')</code>，
+    函式清空 #content 後呼叫對應 render 函式，整頁重新 innerHTML。
+  </p>
+  <div class="nav-grid">
+    <div class="nav-cell">
+      <span class="icon">📊</span>
+      <div class="name">集團總覽</div>
+      <div class="fn">renderDashboard()</div>
+    </div>
+    <div class="nav-cell">
+      <span class="icon">🏭</span>
+      <div class="name">單位追蹤</div>
+      <div class="fn">renderUnits()</div>
+    </div>
+    <div class="nav-cell">
+      <span class="icon">💡</span>
+      <div class="name">AI 應用案例</div>
+      <div class="fn">renderCases()</div>
+    </div>
+    <div class="nav-cell">
+      <span class="icon">👥</span>
+      <div class="name">AI 人才網路</div>
+      <div class="fn">renderTalent()</div>
+    </div>
+    <div class="nav-cell">
+      <span class="icon">🎓</span>
+      <div class="name">課程安排</div>
+      <div class="fn">renderTraining()</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:#64748b;margin-top:8px">
+    篩選功能（單位的地區/等級篩選、案例的 tab 切換）直接操作 DOM 局部更新，
+    不重跑整個 navigate，因此篩選狀態在頁面切換後會重置。
+  </p>
+</div>
+
+<!-- 6. CSS Design System -->
+<div class="section">
+  <div class="section-title"><span class="num">6</span> CSS 元件系統</div>
+  <table>
+    <thead>
+      <tr><th>Class 名稱</th><th>用途</th><th>使用頁面</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>.kpi-grid-4</code> / <code>.kpi-grid-3</code><br><code>.kpi-card.green/yellow/purple/gold/blue</code></td>
+        <td>頂部 KPI 數字卡片，grid 版型</td>
+        <td><span class="tag tg-gray">集團總覽</span><span class="tag tg-gray">人才</span><span class="tag tg-gray">課程</span></td>
+      </tr>
+      <tr>
+        <td><code>.maturity-summary</code> / <code>.msummary-row</code></td>
+        <td>L0–L5 橫條圖（比例尺依最大值計算）</td>
+        <td><span class="tag tg-gray">集團總覽</span></td>
+      </tr>
+      <tr>
+        <td><code>.maturity-table</code></td>
+        <td>成熟度矩陣表格，圓點顯示進度</td>
+        <td><span class="tag tg-gray">集團總覽</span></td>
+      </tr>
+      <tr>
+        <td><code>.level-badge</code></td>
+        <td>L0–L5 色標籤，顏色由 <code>MATURITY_LEVELS[level].color</code> inline 注入</td>
+        <td><span class="tag tg-gray">所有頁面</span></td>
+      </tr>
+      <tr>
+        <td><code>.level-dot</code> / <code>.level-dot-done</code></td>
+        <td>矩陣中的未達 / 已通過圓點</td>
+        <td><span class="tag tg-gray">集團總覽</span></td>
+      </tr>
+      <tr>
+        <td><code>.region-group</code> / <code>.region-mini-card</code><br><code>.region-card-gold/yellow/blue/lblue/gray</code></td>
+        <td>地區分組卡片，背景色由 regions.color 決定</td>
+        <td><span class="tag tg-gray">集團總覽</span></td>
+      </tr>
+      <tr>
+        <td><code>.data-table</code></td>
+        <td>通用資料表格（hover 效果、sticky header）</td>
+        <td><span class="tag tg-gray">單位追蹤</span><span class="tag tg-gray">課程矩陣</span></td>
+      </tr>
+      <tr>
+        <td><code>.filter-bar</code> / <code>.filter-select</code></td>
+        <td>頁面頂部篩選器列</td>
+        <td><span class="tag tg-gray">單位追蹤</span><span class="tag tg-gray">案例</span></td>
+      </tr>
+      <tr>
+        <td><code>.tab-bar</code> / <code>.tab-btn.active</code></td>
+        <td>案例頁 全部 / PoC 中 / 已上線 分頁切換</td>
+        <td><span class="tag tg-gray">AI 應用案例</span></td>
+      </tr>
+      <tr>
+        <td><code>.case-card</code> / <code>.arch-note</code></td>
+        <td>案例卡片；灰底等寬字體架構說明區塊</td>
+        <td><span class="tag tg-gray">AI 應用案例</span></td>
+      </tr>
+      <tr>
+        <td><code>.talent-card</code> / <code>.seed-badge</code></td>
+        <td>人才卡片；種子成員紫色標籤</td>
+        <td><span class="tag tg-gray">AI 人才網路</span></td>
+      </tr>
+      <tr>
+        <td><code>.training-card</code> / <code>.progress-bar</code></td>
+        <td>課程卡片；enrolled/capacity 進度條</td>
+        <td><span class="tag tg-gray">課程安排</span></td>
+      </tr>
+      <tr>
+        <td><code>.tag</code> / <code>.tag-blue/green/yellow/gray/outline</code></td>
+        <td>通用小標籤（PoC 項目、工具、狀態）</td>
+        <td><span class="tag tg-gray">所有頁面</span></td>
+      </tr>
+      <tr>
+        <td><code>.two-col.wide-left</code></td>
+        <td>集團總覽 2 欄版型（左寬右窄）</td>
+        <td><span class="tag tg-gray">集團總覽</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 7. Key Design Decisions -->
+<div class="section">
+  <div class="section-title"><span class="num">7</span> 關鍵設計決策</div>
+  <div class="decision-grid">
+
+    <div class="decision-card">
+      <div class="q">為什麼不用 React / Vue？</div>
+      <div class="a">靜態 HTML + innerHTML 渲染</div>
+      <div class="why">
+        單人維護、無 CI/CD 建構需求、GitHub Pages 直接托管靜態檔。
+        框架帶來的 bundler / node_modules 複雜度超過本專案需要。
+        缺點：篩選後切換頁面會重置狀態。
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="q">為什麼不用 Firebase / Supabase？</div>
+      <div class="a">Google Sheets API（唯讀）</div>
+      <div class="why">
+        只有一位管理員寫入資料，主管唯讀。
+        Sheets 本身就是最熟悉的編輯介面，免去後台管理頁開發。
+        敏感性低，無需即時多人同步。
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="q">為什麼 data.js 的 mock 資料要保留？</div>
+      <div class="a">Fallback 機制</div>
+      <div class="why">
+        Sheets API 需要網路、API key 限制、分頁若格式錯誤會失敗。
+        <code>Promise.allSettled</code> 保證某分頁失敗不影響其他分頁，
+        且 mock 資料確保離線 / key 過期時畫面不空白。
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="q">API Key 安全性？</div>
+      <div class="a">HTTP Referrer 限制</div>
+      <div class="why">
+        Key 限制只允許來自 <code>https://markcqhsu.github.io/*</code> 的請求。
+        Sheets 本身唯讀（無寫入權限），資料非高度敏感，
+        此方案在安全性與便利性間取得平衡。
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="q">成熟度等級顏色怎麼決定？</div>
+      <div class="a">MATURITY_LEVELS 常數集中管理</div>
+      <div class="why">
+        L0–L5 的 label / desc / color 定義在 data.js 的 <code>MATURITY_LEVELS</code> 物件。
+        所有頁面透過 <code>lv(level).color</code> 取色，改一處全站同步，
+        不在 CSS 寫死顏色。
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="q">地區分組怎麼運作？</div>
+      <div class="a">regions.group 動態分組</div>
+      <div class="why">
+        集團總覽的地區卡用 <code>regions.group</code> 欄位動態 groupBy，
+        不在 JS 寫死「台灣 / 中國 / 東南亞」。
+        新增地區只需在 Sheets 填 group，無需改程式。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 8. Limitations -->
+<div class="section">
+  <div class="section-title"><span class="num">8</span> 已知限制</div>
+  <table>
+    <thead><tr><th>限制</th><th>原因</th><th>如果未來需要解決</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>篩選狀態在切換頁面後重置</td>
+        <td>每次 navigate() 整頁重渲染</td>
+        <td>加 URL hash 記錄狀態，或改用前端路由框架</td>
+      </tr>
+      <tr>
+        <td>Sheets 資料無快取，每次開頁面重新抓取</td>
+        <td>無 Service Worker / localStorage</td>
+        <td>加 <code>localStorage</code> cache + TTL（如 5 分鐘）</td>
+      </tr>
+      <tr>
+        <td>無法即時推播更新（需手動重新整理）</td>
+        <td>靜態前端，無 WebSocket</td>
+        <td>加定時 reload 或 Google Sheets 的 Pub/Sub webhook</td>
+      </tr>
+      <tr>
+        <td>API Key 明碼暴露在原始碼</td>
+        <td>靜態部署無法隱藏</td>
+        <td>改用 OAuth 或後端 proxy；現況靠 Referrer 限制降低風險</td>
+      </tr>
+      <tr>
+        <td>資料量大時 DOM 渲染會慢</td>
+        <td>innerHTML 全量重繪，無虛擬 DOM</td>
+        <td>加虛擬捲動（Virtual Scroll）或分頁</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p style="margin-top:32px;font-size:12px;color:#94a3b8;text-align:right">
+  宏全集團 AI 推動管理系統 · 製作日期 2026-05-16
+</p>
+
+</body>
+</html>

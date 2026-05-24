@@ -4,6 +4,7 @@ const PAGE_TITLES = {
   cases:     'AI 應用案例',
   talent:    'AI 人才網路',
   training:  '課程安排',
+  plan:      '導入計畫',
   api:       'API 用量管理',
   changelog: '修改記錄',
 };
@@ -74,6 +75,7 @@ function navigate(page) {
     case 'cases':     renderCases(content);     break;
     case 'talent':    renderTalent(content);    break;
     case 'training':  renderTraining(content);  break;
+    case 'plan':      renderPlan(content);      break;
     case 'api':       renderApiUsage(content);  break;
     case 'changelog': renderChangelog(content); break;
   }
@@ -920,6 +922,205 @@ function renderApiUsage(el) {
             </tr>`).join('')}
         </tbody>
       </table>
+    </div>
+  `;
+}
+
+// ── Plan ──
+
+function renderPlan(el) {
+  const phases = [
+    {
+      id: 'discover',
+      label: '01 · 調查',
+      color: '#2563eb',
+      bg: '#eff6ff',
+      border: '#bfdbfe',
+      steps: [
+        { n: 1, icon: '🔍', name: '資訊普查', desc: '盤點各單位現有流程、系統與資料現況' },
+        { n: 2, icon: '🗣️', name: '單位訪談', desc: '深入了解各單位痛點、需求與期望' },
+        { n: 3, icon: '📝', name: '問題蒐集', desc: '彙整可被 AI 解決的問題清單與優先序' },
+      ],
+    },
+    {
+      id: 'evaluate',
+      label: '02 · 評估',
+      color: '#7c3aed',
+      bg: '#f5f3ff',
+      border: '#ddd6fe',
+      steps: [
+        { n: 4, icon: '⚖️', name: '可行性評估', desc: '技術可行性、資料完整度與投資報酬率分析' },
+      ],
+    },
+    {
+      id: 'execute',
+      label: '03 · 執行',
+      color: '#059669',
+      bg: '#ecfdf5',
+      border: '#a7f3d0',
+      steps: [
+        { n: 5, icon: '🧪', name: 'PoC',   desc: '小規模驗證 AI 解決方案，快速迭代優化' },
+        { n: 6, icon: '🚀', name: '實際導入', desc: '系統整合、上線部署與人員培訓落地' },
+        { n: 7, icon: '📊', name: '成果驗證', desc: '確認效益與改善點' },
+      ],
+    },
+    {
+      id: 'scale',
+      label: '04 · 擴散',
+      color: '#d97706',
+      bg: '#fffbeb',
+      border: '#fde68a',
+      steps: [
+        { n: 8, icon: '🌐', name: '跨廠複製', desc: '將成功模式標準化，推廣至集團各廠區' },
+      ],
+    },
+  ];
+
+  // build step cards for a phase — inline badge (no absolute) to avoid overflow clipping
+  const stepCards = (steps, color) => steps.map((s, i) => `
+    <div style="display:flex;align-items:stretch;gap:0;flex:1 1 0;max-width:260px;min-width:150px">
+      <div style="
+        display:flex;flex-direction:column;align-items:center;
+        background:#fff;
+        border:1.5px solid ${color}33;
+        border-radius:14px;
+        padding:16px 14px 18px;
+        width:100%;
+        box-shadow:0 2px 10px ${color}15;
+      ">
+        <!-- step number badge — inline so no overflow clipping -->
+        <div style="
+          width:28px;height:28px;border-radius:50%;
+          background:${color};color:#fff;
+          font-size:12px;font-weight:700;
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 2px 6px ${color}44;
+          margin-bottom:10px;flex-shrink:0;
+        ">${s.n}</div>
+        <div style="font-size:26px;margin-bottom:8px;line-height:1">${s.icon}</div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:5px;text-align:center">${s.name}</div>
+        <div style="font-size:11.5px;color:#64748b;text-align:center;line-height:1.55">${s.desc}</div>
+      </div>
+    </div>
+    ${i < steps.length - 1 ? `
+      <div style="
+        display:flex;align-items:center;padding:0 6px;flex-shrink:0;
+        color:${color};font-size:22px;opacity:.5;font-weight:300;
+      ">›</div>
+    ` : ''}
+  `).join('');
+
+  // phase → phase connector
+  const phaseArrow = `
+    <div style="display:flex;justify-content:center;align-items:center;padding:8px 0">
+      <div style="
+        width:2px;height:28px;
+        background:linear-gradient(to bottom,#e2e8f0,#cbd5e1);
+      "></div>
+    </div>
+    <div style="display:flex;justify-content:center;margin-bottom:8px">
+      <div style="
+        width:0;height:0;
+        border-left:7px solid transparent;
+        border-right:7px solid transparent;
+        border-top:8px solid #cbd5e1;
+      "></div>
+    </div>
+  `;
+
+  el.innerHTML = `
+    <!-- Hero -->
+    <div style="
+      background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1d4ed8 100%);
+      border-radius:16px;
+      padding:36px 32px;
+      margin-bottom:24px;
+      position:relative;
+      overflow:hidden;
+    ">
+      <div style="position:absolute;inset:0;opacity:.04;background:repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%);background-size:20px 20px"></div>
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span style="
+            background:rgba(255,255,255,.15);
+            border:1px solid rgba(255,255,255,.25);
+            border-radius:8px;padding:6px 14px;
+            font-size:12px;font-weight:600;color:#93c5fd;letter-spacing:.05em
+          ">AI 導入框架</span>
+        </div>
+        <h2 style="color:#fff;font-size:26px;font-weight:700;margin-bottom:10px;line-height:1.3">
+          八步驟 AI 導入計畫
+        </h2>
+        <p style="color:#93c5fd;font-size:14px;line-height:1.7;max-width:480px">
+          從初步調查到全廠複製，系統性推動每個單位的 AI 轉型，確保每一步都有依據、每一步都可驗證。
+        </p>
+        <div style="display:flex;gap:20px;margin-top:20px;flex-wrap:wrap">
+          ${[
+            { n: '4', label: '推動階段' },
+            { n: '8', label: '執行步驟' },
+            { n: '∞', label: '持續優化' },
+          ].map(s => `
+            <div>
+              <div style="color:#fff;font-size:22px;font-weight:700">${s.n}</div>
+              <div style="color:#93c5fd;font-size:12px">${s.label}</div>
+            </div>
+          `).join('<div style="width:1px;background:rgba(255,255,255,.15)"></div>')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Phases -->
+    <div style="display:flex;flex-direction:column;gap:0;max-width:860px;margin:0 auto;width:100%">
+      ${phases.map((phase, pi) => `
+        <!-- Phase ${pi + 1} -->
+        <div style="
+          background:${phase.bg};
+          border:1.5px solid ${phase.border};
+          border-radius:14px;
+          padding:24px 22px 22px;
+        ">
+          <!-- Phase header -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <div style="
+              width:4px;height:22px;border-radius:2px;
+              background:${phase.color};flex-shrink:0;
+            "></div>
+            <span style="
+              font-size:13px;font-weight:700;
+              color:${phase.color};
+              letter-spacing:.06em;
+              text-transform:uppercase;
+            ">${phase.label}</span>
+            <div style="flex:1;height:1px;background:${phase.border}"></div>
+            <span style="
+              font-size:11px;color:${phase.color};
+              background:${phase.color}18;
+              border-radius:99px;padding:2px 10px;font-weight:600;
+            ">${phase.steps.length} 步驟</span>
+          </div>
+
+          <!-- Step cards row -->
+          <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:12px">
+            ${stepCards(phase.steps, phase.color)}
+          </div>
+        </div>
+
+        ${pi < phases.length - 1 ? phaseArrow : ''}
+      `).join('')}
+    </div>
+
+    <!-- Footer note -->
+    <div style="
+      max-width:860px;margin:20px auto 0;
+      display:flex;align-items:flex-start;gap:10px;
+      background:#f8fafc;border:1px solid #e2e8f0;
+      border-radius:10px;padding:14px 18px;
+    ">
+      <span style="font-size:16px;flex-shrink:0">💡</span>
+      <p style="font-size:12.5px;color:#64748b;line-height:1.7;margin:0">
+        此框架可依單位規模彈性調整步驟深度。部分成熟度較高的單位可從 <strong>PoC</strong> 直接切入；
+        若已有成功案例，亦可優先推進 <strong>跨廠複製</strong>，同步帶動其他廠區啟動調查。
+      </p>
     </div>
   `;
 }

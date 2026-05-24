@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<title>Google Sheets ↔ Dashboard 資料對照表</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; padding: 32px; }
+
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin-bottom: 32px; }
+
+  /* ── Flow diagram ── */
+  .flow { display: flex; align-items: flex-start; gap: 0; margin-bottom: 40px; }
+
+  .col-sheets { display: flex; flex-direction: column; gap: 10px; width: 180px; flex-shrink: 0; }
+  .col-arrow  { display: flex; align-items: center; justify-content: center; width: 60px; flex-shrink: 0; }
+  .col-pages  { display: flex; flex-direction: column; gap: 10px; width: 180px; flex-shrink: 0; }
+
+  .sheet-chip, .page-chip {
+    border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;
+    text-align: center; border: 2px solid transparent;
+  }
+  .sheet-chip { background: #fff; }
+  .page-chip  { background: #fff; }
+
+  .s-regions  { border-color: #f59e0b; color: #92400e; }
+  .s-units    { border-color: #3b82f6; color: #1e40af; }
+  .s-cases    { border-color: #8b5cf6; color: #4c1d95; }
+  .s-talents  { border-color: #ec4899; color: #831843; }
+  .s-training { border-color: #10b981; color: #064e3b; }
+  .s-updates  { border-color: #64748b; color: #334155; }
+
+  .p-dashboard { border-color: #f59e0b; color: #92400e; }
+  .p-units     { border-color: #3b82f6; color: #1e40af; }
+  .p-cases     { border-color: #8b5cf6; color: #4c1d95; }
+  .p-talent    { border-color: #ec4899; color: #831843; }
+  .p-training  { border-color: #10b981; color: #064e3b; }
+
+  .arrow-svg { width: 100%; height: 380px; }
+
+  /* ── Detail table ── */
+  .section-title {
+    font-size: 15px; font-weight: 700; margin-bottom: 12px; margin-top: 36px;
+    padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot {
+    width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff;
+          border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  thead { background: #f1f5f9; }
+  th { padding: 10px 14px; text-align: left; font-size: 12px; color: #475569; font-weight: 600; }
+  td { padding: 9px 14px; border-top: 1px solid #f1f5f9; vertical-align: top; }
+  tr:hover td { background: #fafafa; }
+
+  .tab-badge {
+    display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600;
+  }
+  .page-badge {
+    display: inline-block; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: 500;
+    background: #f1f5f9; color: #475569; margin-right: 4px; margin-bottom: 3px;
+    white-space: nowrap;
+  }
+  .field-list { font-size: 12px; color: #64748b; line-height: 1.8; }
+  .field-key  { background: #f1f5f9; border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 11px; color: #1e293b; margin-right: 2px; white-space: nowrap; }
+  .used-where { font-size: 12px; color: #475569; }
+
+  .note { font-size: 12px; color: #94a3b8; font-style: italic; }
+
+  @media print {
+    body { background: white; padding: 16px; }
+    table { box-shadow: none; border: 1px solid #e2e8f0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Google Sheets ↔ Dashboard 資料對照表</h1>
+<p class="subtitle">宏全集團 AI 推動管理系統 · v2.0.0 · 6 個分頁 → 5 個頁面</p>
+
+<!-- ── Flow Diagram ── -->
+<div class="flow">
+  <!-- Sheets column -->
+  <div class="col-sheets">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:4px;text-align:center">GOOGLE SHEETS</div>
+    <div class="sheet-chip s-regions">regions</div>
+    <div class="sheet-chip s-units">units</div>
+    <div class="sheet-chip s-cases">cases</div>
+    <div class="sheet-chip s-talents">talents</div>
+    <div class="sheet-chip s-training">training</div>
+    <div class="sheet-chip s-updates">updates</div>
+  </div>
+
+  <!-- SVG arrows -->
+  <div class="col-arrow">
+    <svg class="arrow-svg" viewBox="0 0 60 380" xmlns="http://www.w3.org/2000/svg">
+      <!-- regions → 集團總覽 (row0=26, page0=26) -->
+      <path d="M0,26 Q30,26 60,26" stroke="#f59e0b" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- units → 集團總覽 -->
+      <path d="M0,62 Q30,44 60,26" stroke="#3b82f6" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- units → 單位追蹤 -->
+      <path d="M0,62 Q30,62 60,97" stroke="#3b82f6" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- units → AI人才網路 -->
+      <path d="M0,62 Q30,80 60,239" stroke="#3b82f6" stroke-width="1" fill="none" stroke-dasharray="4 3" opacity=".4"/>
+      <!-- cases → 集團總覽 -->
+      <path d="M0,98 Q30,62 60,26" stroke="#8b5cf6" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- cases → AI應用案例 -->
+      <path d="M0,98 Q30,98 60,168" stroke="#8b5cf6" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- talents → 集團總覽 -->
+      <path d="M0,134 Q30,80 60,26" stroke="#ec4899" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- talents → AI人才網路 -->
+      <path d="M0,134 Q30,134 60,239" stroke="#ec4899" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- talents → 課程安排 (seed in training) -->
+      <path d="M0,134 Q30,150 60,310" stroke="#ec4899" stroke-width="1" fill="none" stroke-dasharray="4 3" opacity=".4"/>
+      <!-- training → 課程安排 -->
+      <path d="M0,170 Q30,170 60,310" stroke="#10b981" stroke-width="1.5" fill="none" opacity=".6"/>
+      <!-- updates → 集團總覽 -->
+      <path d="M0,206 Q30,116 60,26" stroke="#64748b" stroke-width="1.5" fill="none" opacity=".6"/>
+    </svg>
+  </div>
+
+  <!-- Pages column -->
+  <div class="col-pages">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:4px;text-align:center">DASHBOARD 頁面</div>
+    <div class="page-chip p-dashboard">📊 集團總覽</div>
+    <div class="page-chip p-units">🏭 單位追蹤</div>
+    <div class="page-chip p-cases">💡 AI 應用案例</div>
+    <div class="page-chip p-talent">👥 AI 人才網路</div>
+    <div class="page-chip p-training">🎓 課程安排</div>
+  </div>
+</div>
+
+<!-- ── Detail: by Sheet tab ── -->
+<div class="section-title">
+  <span class="dot" style="background:#3b82f6"></span>
+  各分頁欄位與使用位置
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:100px">分頁</th>
+      <th style="width:200px">欄位</th>
+      <th style="width:180px">使用頁面</th>
+      <th>顯示位置 / 說明</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- regions -->
+    <tr>
+      <td rowspan="3">
+        <span class="tab-badge" style="background:#fef3c7;color:#92400e">regions</span>
+      </td>
+      <td class="field-list"><span class="field-key">name</span></td>
+      <td><span class="page-badge">集團總覽</span></td>
+      <td class="used-where">地區卡片標題；<strong>必須與 units.region 完全一致</strong>，否則地區卡顯示 0 單位</td>
+    </tr>
+    <tr>
+      <td class="field-list"><span class="field-key">group</span></td>
+      <td><span class="page-badge">集團總覽</span></td>
+      <td class="used-where">各地區啟動狀況的分組標題（台灣 / 中國宏全 / 東南亞總部）</td>
+    </tr>
+    <tr>
+      <td class="field-list"><span class="field-key">color</span></td>
+      <td><span class="page-badge">集團總覽</span></td>
+      <td class="used-where">地區卡片背景色（gold / yellow / blue / lblue / gray）</td>
+    </tr>
+
+    <!-- units -->
+    <tr>
+      <td rowspan="6">
+        <span class="tab-badge" style="background:#dbeafe;color:#1e40af">units</span>
+      </td>
+      <td class="field-list">
+        <span class="field-key">unitName</span>
+        <span class="field-key">region</span>
+        <span class="field-key">factory</span>
+      </td>
+      <td><span class="page-badge">集團總覽</span><span class="page-badge">單位追蹤</span></td>
+      <td class="used-where">成熟度矩陣表格前兩欄；單位追蹤主表格</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">maturityLevel</span>
+      </td>
+      <td><span class="page-badge">集團總覽</span><span class="page-badge">單位追蹤</span></td>
+      <td class="used-where">成熟度矩陣（L0–L5 進度圓點）；地區卡片最高等級色點；單位追蹤篩選 + 表格色標籤</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">needSupport</span>
+      </td>
+      <td><span class="page-badge">集團總覽</span><span class="page-badge">單位追蹤</span><span class="page-badge">AI 人才網路</span></td>
+      <td class="used-where">集團總覽 KPI「需支援單位數」；單位追蹤篩選；人才網路「尚無 AI 人員單位」區塊黃色標籤</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">aiContact</span>
+        <span class="field-key">aiStaff</span>
+      </td>
+      <td><span class="page-badge">單位追蹤</span><span class="page-badge">AI 人才網路</span></td>
+      <td class="used-where">單位追蹤表格「窗口 / AI 人員」欄；aiStaff 為空 → 出現在人才網路的警示區塊</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">pocItems</span>
+      </td>
+      <td><span class="page-badge">單位追蹤</span></td>
+      <td class="used-where">單位追蹤表格「PoC 項目」欄，以藍色標籤呈現（逗號分隔）</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">estimatedBenefit</span>
+        <span class="field-key">dueDate</span>
+        <span class="field-key">lastUpdated</span>
+      </td>
+      <td><span class="page-badge">單位追蹤</span></td>
+      <td class="used-where">單位追蹤表格後三欄</td>
+    </tr>
+
+    <!-- cases -->
+    <tr>
+      <td rowspan="5">
+        <span class="tab-badge" style="background:#ede9fe;color:#4c1d95">cases</span>
+      </td>
+      <td class="field-list">
+        <span class="field-key">stage</span>
+        <span class="field-key">isReplicable</span>
+      </td>
+      <td><span class="page-badge">集團總覽</span><span class="page-badge">AI 應用案例</span></td>
+      <td class="used-where">集團總覽 KPI（已完成 / PoC 中 / 可複製 計數）；應用案例頁面 tab 篩選</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">caseName</span>
+        <span class="field-key">unitName</span>
+        <span class="field-key">region</span>
+        <span class="field-key">appType</span>
+      </td>
+      <td><span class="page-badge">AI 應用案例</span></td>
+      <td class="used-where">案例卡片標題、副標、類型標籤；appType 下拉篩選</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">toolsUsed</span>
+        <span class="field-key">architectureNote</span>
+      </td>
+      <td><span class="page-badge">AI 應用案例</span></td>
+      <td class="used-where">工具標籤（灰框）；灰底架構說明區塊</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">problem</span>
+        <span class="field-key">solution</span>
+        <span class="field-key">estimatedBenefit</span>
+        <span class="field-key">actualBenefit</span>
+      </td>
+      <td><span class="page-badge">AI 應用案例</span></td>
+      <td class="used-where">問題 / 解法 / 預估效益；已上線案例才顯示「實際成效」（綠色粗體）</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">replicableTo</span>
+        <span class="field-key">owner</span>
+        <span class="field-key">lastUpdated</span>
+      </td>
+      <td><span class="page-badge">AI 應用案例</span></td>
+      <td class="used-where">可複製目標單位列表（逗號分隔）；負責人 + 更新日期</td>
+    </tr>
+
+    <!-- talents -->
+    <tr>
+      <td rowspan="4">
+        <span class="tab-badge" style="background:#fce7f3;color:#831843">talents</span>
+      </td>
+      <td class="field-list">
+        <span class="field-key">isSeed</span>
+      </td>
+      <td><span class="page-badge">集團總覽</span><span class="page-badge">AI 人才網路</span><span class="page-badge">課程安排</span></td>
+      <td class="used-where">集團總覽 KPI「種子成員數」；人才卡片「種子」紫色徽章 + 頭像色；課程報名名單加 ⭐</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">name</span>
+        <span class="field-key">unit</span>
+        <span class="field-key">region</span>
+        <span class="field-key">role</span>
+      </td>
+      <td><span class="page-badge">AI 人才網路</span><span class="page-badge">課程安排</span></td>
+      <td class="used-where">人才卡片基本資訊；人才 × 課程矩陣的列；region 用於卡片分組</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">skills</span>
+        <span class="field-key">supportScope</span>
+      </td>
+      <td><span class="page-badge">AI 人才網路</span></td>
+      <td class="used-where">技能標籤群；支援範圍文字</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">completedCourses</span>
+      </td>
+      <td><span class="page-badge">AI 人才網路</span><span class="page-badge">集團總覽</span></td>
+      <td class="used-where">人才卡片底部已完成課程清單（✓）；集團總覽 KPI「累計修課人次」</td>
+    </tr>
+
+    <!-- training -->
+    <tr>
+      <td rowspan="3">
+        <span class="tab-badge" style="background:#d1fae5;color:#064e3b">training</span>
+      </td>
+      <td class="field-list">
+        <span class="field-key">module</span>
+        <span class="field-key">desc</span>
+        <span class="field-key">icon</span>
+        <span class="field-key">date</span>
+        <span class="field-key">status</span>
+      </td>
+      <td><span class="page-badge">課程安排</span></td>
+      <td class="used-where">課程卡片標題 / 說明 / 圖示 / 日期 / 狀態標籤（招生中=綠 / 規劃中=黃）；KPI 計數</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">enrolled</span>
+        <span class="field-key">capacity</span>
+      </td>
+      <td><span class="page-badge">課程安排</span></td>
+      <td class="used-where">進度條 enrolled/capacity；KPI「已報名人次」加總</td>
+    </tr>
+    <tr>
+      <td class="field-list">
+        <span class="field-key">participants</span>
+      </td>
+      <td><span class="page-badge">課程安排</span></td>
+      <td class="used-where">課程卡片學員名單（逗號分隔，比對 talents.name 標出種子）；人才 × 課程矩陣的 ✓</td>
+    </tr>
+
+    <!-- updates -->
+    <tr>
+      <td>
+        <span class="tab-badge" style="background:#f1f5f9;color:#334155">updates</span>
+      </td>
+      <td class="field-list">
+        <span class="field-key">text</span>
+        <span class="field-key">date</span>
+      </td>
+      <td><span class="page-badge">集團總覽</span></td>
+      <td class="used-where">集團總覽右側「最新動態」列表，依 Sheets 順序顯示（建議最新的放最上）</td>
+    </tr>
+
+  </tbody>
+</table>
+
+<!-- ── Key constraints ── -->
+<div class="section-title" style="margin-top:32px">
+  <span class="dot" style="background:#ef4444"></span>
+  關鍵約束（填錯會影響顯示）
+</div>
+
+<table>
+  <thead>
+    <tr><th style="width:200px">規則</th><th>說明</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>regions.name = units.region</strong></td>
+      <td>集團總覽的地區卡片靠這個對應；若不一致，該地區顯示「0 單位」</td>
+    </tr>
+    <tr>
+      <td><strong>training.participants 姓名 = talents.name</strong></td>
+      <td>課程安排用姓名字串比對 talents，找不到則無法顯示 ⭐ 種子標記</td>
+    </tr>
+    <tr>
+      <td><strong>cases.stage 只能填</strong> <span class="field-key">poc</span> 或 <span class="field-key">completed</span></td>
+      <td>填其他值 tab 篩選不會計入，stageTag 顯示灰色</td>
+    </tr>
+    <tr>
+      <td><strong>布林欄位</strong>（needSupport / isReplicable / isSeed）</td>
+      <td>填 <span class="field-key">TRUE</span> / <span class="field-key">FALSE</span>（大寫），或 <span class="field-key">true</span> / <span class="field-key">是</span> 皆可</td>
+    </tr>
+    <tr>
+      <td><strong>陣列欄位</strong>（pocItems / toolsUsed / skills 等）</td>
+      <td>以英文逗號分隔，sheets.js 會自動 split：<code>PaddleOCR, Python, Cloud Run</code></td>
+    </tr>
+    <tr>
+      <td><strong>maturityLevel 格式</strong></td>
+      <td>只能填 <span class="field-key">L0</span>–<span class="field-key">L5</span>，大寫 L + 數字；填錯會 fallback 到 L0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="margin-top:32px;font-size:12px;color:#94a3b8;text-align:right">
+  宏全集團 AI 推動管理系統 · 製作日期 2026-05-16
+</p>
+
+</body>
+</html>
