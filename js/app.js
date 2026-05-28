@@ -199,9 +199,9 @@ function renderDashboard(el) {
     <!-- API Usage Summary -->
     ${apiLatest.length ? `
     <div class="card" style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="api-dash-header">
         <div class="card-title" style="margin-bottom:0">API 用量快覽（${apiLatestMonth}）</div>
-        <div style="display:flex;align-items:center;gap:16px">
+        <div class="api-dash-meta">
           <span style="font-size:13px;color:var(--text-muted)">
             本月花費 <strong style="color:var(--text)">$${apiTotalCost.toFixed(2)}</strong>
             / 預算 $${apiTotalBudget.toFixed(2)}
@@ -215,13 +215,13 @@ function renderDashboard(el) {
           const pct = Math.min(r.cost_usd / r.budget_usd * 100, 100);
           const over = r.cost_usd > r.budget_usd;
           return `
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="width:96px;font-size:12px;font-weight:500;flex-shrink:0;color:var(--text)">${r.unit}</span>
+            <div class="api-dash-row">
+              <span class="api-dash-unit">${r.unit}</span>
               <span class="api-provider-badge api-provider-${r.provider.toLowerCase()}" style="flex-shrink:0">${r.provider}</span>
-              <div style="flex:1;background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden">
+              <div style="flex:1;background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden;min-width:40px">
                 <div style="width:${pct}%;height:100%;background:${over ? '#ef4444' : '#2563eb'};border-radius:4px"></div>
               </div>
-              <span style="width:100px;font-size:12px;color:${over ? '#ef4444' : 'var(--text-muted)'};text-align:right;flex-shrink:0;font-weight:${over ? '600' : '400'}">
+              <span class="api-dash-amount" style="color:${over ? '#ef4444' : 'var(--text-muted)'};font-weight:${over ? '600' : '400'}">
                 $${r.cost_usd.toFixed(2)} / $${r.budget_usd.toFixed(2)}
               </span>
             </div>`;
@@ -978,7 +978,7 @@ function renderPlan(el) {
 
   // build step cards for a phase — inline badge (no absolute) to avoid overflow clipping
   const stepCards = (steps, color) => steps.map((s, i) => `
-    <div style="display:flex;align-items:stretch;gap:0;flex:1 1 0;max-width:260px;min-width:150px">
+    <div class="plan-step-item" style="display:flex;align-items:stretch;gap:0;flex:1 1 0;max-width:260px;min-width:150px">
       <div style="
         display:flex;flex-direction:column;align-items:center;
         background:#fff;
@@ -1003,7 +1003,7 @@ function renderPlan(el) {
       </div>
     </div>
     ${i < steps.length - 1 ? `
-      <div style="
+      <div class="plan-step-sep" style="
         display:flex;align-items:center;padding:0 6px;flex-shrink:0;
         color:${color};font-size:22px;opacity:.5;font-weight:300;
       ">›</div>
@@ -1100,7 +1100,7 @@ function renderPlan(el) {
           </div>
 
           <!-- Step cards row -->
-          <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:12px">
+          <div class="plan-steps-row" style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:12px">
             ${stepCards(phase.steps, phase.color)}
           </div>
         </div>

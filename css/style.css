@@ -494,6 +494,61 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 .api-stat-num { font-weight: 600; color: var(--text); }
 .api-over-warn { color: #ef4444; }
 
+/* ── API Dashboard Summary ── */
+.api-dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.api-dash-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.api-dash-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.api-dash-unit {
+  width: 96px;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.api-dash-amount {
+  width: 100px;
+  font-size: 12px;
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ── Plan Step Cards ── */
+.plan-steps-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+.plan-step-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex: 1 1 0;
+  max-width: 260px;
+  min-width: 150px;
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -589,6 +644,17 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 
   /* API usage → 1 col */
   .api-usage-grid { grid-template-columns: 1fr; }
+
+  /* API dashboard summary row */
+  .api-dash-header { flex-direction: column; align-items: flex-start; }
+  .api-dash-meta { gap: 8px; }
+  .api-dash-unit { width: 80px; }
+  .api-dash-amount { width: auto; }
+
+  /* Plan step cards → stack vertically */
+  .plan-steps-row { flex-direction: column !important; row-gap: 10px !important; }
+  .plan-step-item { max-width: 100% !important; min-width: 0 !important; width: 100% !important; flex: none !important; }
+  .plan-step-sep { display: none !important; }
 
   /* Proposal card → stack */
   .proposal-card { flex-direction: column; gap: 8px; }
