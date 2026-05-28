@@ -26,7 +26,7 @@ const toArr  = v => v ? v.split(/[,、]/).map(s => s.trim()).filter(Boolean) : [
 const toNum  = v => parseFloat(v) || 0;
 
 async function loadFromSheets() {
-  const TABS = ['regions', 'units', 'cases', 'talents', 'training', 'updates', 'api_usage', 'training_records'];
+  const TABS = ['regions', 'units', 'cases', 'talents', 'training', 'updates', 'api_usage', 'training_records', 'requirements'];
   const results = await Promise.allSettled(TABS.map(t => fetchTab(t)));
   const get = i => (results[i].status === 'fulfilled' ? results[i].value : []);
 
@@ -98,6 +98,12 @@ async function loadFromSheets() {
   const trRecordRows = toObjects(get(7));
   if (trRecordRows.length) {
     APP_DATA.training_records = trRecordRows;
+  }
+
+  // requirements
+  const reqRows = toObjects(get(8));
+  if (reqRows.length) {
+    APP_DATA.requirements = reqRows;
   }
 
   // api_usage

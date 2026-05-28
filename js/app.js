@@ -1,12 +1,13 @@
 const PAGE_TITLES = {
-  dashboard: '集團總覽',
-  units:     '單位 AI 推動追蹤',
-  cases:     'AI 應用案例',
-  talent:    'AI 人才網路',
-  training:  '課程安排',
-  plan:      '導入計畫',
-  api:       'API 用量管理',
-  changelog: '修改記錄',
+  dashboard:    '集團總覽',
+  units:        '單位 AI 推動追蹤',
+  requirements: '需求管理',
+  cases:        'AI 應用案例',
+  talent:       'AI 人才網路',
+  training:     '課程安排',
+  plan:         '導入計畫',
+  api:          'API 用量管理',
+  changelog:    '修改記錄',
 };
 
 // ── Helpers ──
@@ -70,9 +71,10 @@ function navigate(page) {
 
   const content = document.getElementById('content');
   switch (page) {
-    case 'dashboard': renderDashboard(content); break;
-    case 'units':     renderUnits(content);     break;
-    case 'cases':     renderCases(content);     break;
+    case 'dashboard':    renderDashboard(content);    break;
+    case 'units':        renderUnits(content);        break;
+    case 'requirements': renderRequirements(content); break;
+    case 'cases':        renderCases(content);        break;
     case 'talent':    renderTalent(content);    break;
     case 'training':  renderTraining(content);  break;
     case 'plan':      renderPlan(content);      break;
@@ -462,6 +464,152 @@ function filterUnits() {
   if (support !== '') list = list.filter(u => String(u.needSupport) === support);
   document.getElementById('units-tbody').innerHTML = unitsRows(list);
   document.getElementById('units-count').textContent = `${list.length} 個單位`;
+}
+
+// ── Requirements ──
+
+const STATUS_CONFIG = {
+  '蒐集中': { bg: '#f1f5f9', color: '#475569' },
+  '評估中': { bg: '#fef3c7', color: '#92400e' },
+  '已立案': { bg: '#dcfce7', color: '#15803d' },
+  '暫緩':   { bg: '#fee2e2', color: '#991b1b' },
+};
+const PRIORITY_CONFIG = {
+  '高': { bg: '#fee2e2', color: '#991b1b' },
+  '中': { bg: '#fef3c7', color: '#92400e' },
+  '低': { bg: '#f1f5f9', color: '#64748b' },
+};
+const FEASIBILITY_COLOR = { '高': '#22c55e', '中': '#f59e0b', '低': '#ef4444' };
+
+function renderRequirements(el) {
+  const { requirements } = APP_DATA;
+
+  const total      = requirements.length;
+  const collecting = requirements.filter(r => r.status === '蒐集中').length;
+  const evaluating = requirements.filter(r => r.status === '評估中').length;
+  const approved   = requirements.filter(r => r.status === '已立案').length;
+  const paused     = requirements.filter(r => r.status === '暫緩').length;
+
+  const unitNames = [...new Set(requirements.map(r => r.unitName).filter(Boolean))];
+
+  el.innerHTML = `
+    <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px">
+      <div class="kpi-card blue">
+        <div class="kpi-label">總需求數</div>
+        <div class="kpi-value">${total}</div>
+        <div class="kpi-sub">各單位提出需求</div>
+      </div>
+      <div class="kpi-card yellow">
+        <div class="kpi-label">評估中</div>
+        <div class="kpi-value">${evaluating}</div>
+        <div class="kpi-sub">可行性評估進行中</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">已立案</div>
+        <div class="kpi-value">${approved}</div>
+        <div class="kpi-sub">已進入執行階段</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">蒐集中／暫緩</div>
+        <div class="kpi-value">${collecting + paused}</div>
+        <div class="kpi-sub">蒐集中 ${collecting}・暫緩 ${paused}</div>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <div class="filter-bar">
+        <select class="filter-select" id="rf-unit" onchange="filterRequirements()">
+          <option value="">所有單位</option>
+          ${unitNames.map(u => `<option>${u}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="rf-status" onchange="filterRequirements()">
+          <option value="">所有狀態</option>
+          ${['蒐集中','評估中','已立案','暫緩'].map(s => `<option>${s}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="rf-priority" onchange="filterRequirements()">
+          <option value="">所有優先序</option>
+          ${['高','中','低'].map(p => `<option>${p}</option>`).join('')}
+        </select>
+      </div>
+      <span id="req-count" style="font-size:13px;color:#64748b">${total} 個需求</span>
+    </div>
+
+    <div id="req-list">${requirementCards(requirements)}</div>
+  `;
+}
+
+function requirementCards(list) {
+  if (!list.length) return `
+    <div class="placeholder-page">
+      <div class="placeholder-icon">🔍</div>
+      <div class="placeholder-text">尚無需求資料</div>
+      <div class="placeholder-sub">請在 Google Sheets 的 requirements 分頁填入資料</div>
+    </div>`;
+
+  return `<div class="case-grid">
+    ${list.map(r => {
+      const sc = STATUS_CONFIG[r.status]   || { bg: '#f1f5f9', color: '#64748b' };
+      const pc = PRIORITY_CONFIG[r.priority] || { bg: '#f1f5f9', color: '#64748b' };
+      const fc = FEASIBILITY_COLOR[r.feasibility] || '#94a3b8';
+
+      return `
+        <div class="case-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">${r.title || '（未命名）'}</div>
+              <div style="font-size:12px;color:var(--text-muted)">
+                ${r.unitName || '—'}${r.contact ? `<span style="margin-left:6px">· 窗口：<strong style="color:var(--text)">${r.contact}</strong></span>` : ''}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+              <span style="background:${sc.bg};color:${sc.color};font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap">${r.status || '—'}</span>
+              ${r.priority ? `<span style="background:${pc.bg};color:${pc.color};font-size:11px;padding:2px 8px;border-radius:20px;white-space:nowrap">優先：${r.priority}</span>` : ''}
+            </div>
+          </div>
+
+          ${r.problemDesc ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;line-height:1.6"><span style="color:var(--text);font-weight:500">問題：</span>${r.problemDesc}</div>` : ''}
+          ${r.painPoint   ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;line-height:1.6"><span style="color:var(--text);font-weight:500">痛點：</span>${r.painPoint}</div>` : ''}
+
+          ${r.aiDirection ? `
+            <div style="background:#eff6ff;border-left:3px solid #2563eb;border-radius:0 6px 6px 0;padding:7px 10px;margin:8px 0;font-size:12px;color:#1d4ed8;line-height:1.6">
+              💡 ${r.aiDirection}
+            </div>` : ''}
+
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">
+            ${r.feasibility ? `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;color:var(--text-muted)">可行性：<strong style="color:${fc}">${r.feasibility}</strong></span>` : ''}
+            ${r.complexity  ? `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;color:var(--text-muted)">複雜度：<strong style="color:var(--text)">${r.complexity}</strong></span>` : ''}
+            ${r.dataReady   ? `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;color:var(--text-muted)">資料：<strong style="color:var(--text)">${r.dataReady}</strong></span>` : ''}
+          </div>
+
+          ${r.feasibilityNote ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;line-height:1.5">📝 ${r.feasibilityNote}</div>` : ''}
+
+          <div style="border-top:1px solid #f1f5f9;padding-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+            <div style="font-size:12px;color:var(--text-muted)">
+              ${r.assignee ? `負責人：<strong style="color:var(--text)">${r.assignee}</strong>` : ''}
+              ${r.expectedBenefit ? `<span style="margin-left:${r.assignee?'10px':'0'}">預期效益：${r.expectedBenefit}</span>` : ''}
+            </div>
+            <div style="font-size:11px;color:#94a3b8;text-align:right">
+              ${r.linkedCase ? `<span style="color:var(--primary);font-weight:500">→ ${r.linkedCase}</span>  ` : ''}
+              ${r.lastUpdated || ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function filterRequirements() {
+  const unit     = document.getElementById('rf-unit').value;
+  const status   = document.getElementById('rf-status').value;
+  const priority = document.getElementById('rf-priority').value;
+
+  let list = APP_DATA.requirements;
+  if (unit)     list = list.filter(r => r.unitName === unit);
+  if (status)   list = list.filter(r => r.status === status);
+  if (priority) list = list.filter(r => r.priority === priority);
+
+  document.getElementById('req-list').innerHTML = requirementCards(list);
+  document.getElementById('req-count').textContent = `${list.length} 個需求`;
 }
 
 // ── Cases ──
@@ -1187,6 +1335,18 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.7.0',
+    date: '2026-05-28',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: [
+      '新增「需求管理」頁面（側邊欄第4項）',
+      '支援記錄各單位普查需求：問題描述、痛點、AI解法方向、可行性、複雜度、負責人等',
+      '可依單位、狀態、優先序篩選；需求卡片顯示完整資訊',
+      '資料來源：Google Sheets requirements 分頁（18 欄）',
+    ],
+  },
   {
     version: 'v2.6.5',
     date: '2026-05-28',

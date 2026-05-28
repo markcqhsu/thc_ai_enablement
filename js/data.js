@@ -9,6 +9,7 @@ const APP_DATA = {
   training_records: [],
   api_usage:        [],
   updates:          [],
+  requirements:     [],
 };
 
 // ── L 等級定義（對齊規劃書）──
