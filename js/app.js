@@ -480,6 +480,7 @@ const PRIORITY_CONFIG = {
   '低': { bg: '#f1f5f9', color: '#64748b' },
 };
 const FEASIBILITY_COLOR = { '高': '#22c55e', '中': '#f59e0b', '低': '#ef4444' };
+const COMPLEXITY_COLOR  = { '高': '#ef4444', '中': '#f59e0b', '低': '#22c55e' };
 
 function renderRequirements(el) {
   const { requirements } = APP_DATA;
@@ -548,51 +549,56 @@ function requirementCards(list) {
 
   return `<div class="case-grid">
     ${list.map(r => {
-      const sc = STATUS_CONFIG[r.status]   || { bg: '#f1f5f9', color: '#64748b' };
-      const pc = PRIORITY_CONFIG[r.priority] || { bg: '#f1f5f9', color: '#64748b' };
+      const sc = STATUS_CONFIG[r.status]      || { bg: '#f1f5f9', color: '#64748b' };
+      const pc = PRIORITY_CONFIG[r.priority]  || { bg: '#f1f5f9', color: '#64748b' };
       const fc = FEASIBILITY_COLOR[r.feasibility] || '#94a3b8';
+      const cc = COMPLEXITY_COLOR[r.complexity]   || '#94a3b8';
 
       return `
         <div class="case-card">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
-            <div style="flex:1;min-width:0">
-              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">${r.title || '（未命名）'}</div>
-              <div style="font-size:12px;color:var(--text-muted)">
-                ${r.unitName || '—'}${r.contact ? `<span style="margin-left:6px">· 窗口：<strong style="color:var(--text)">${r.contact}</strong></span>` : ''}
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
-              <span style="background:${sc.bg};color:${sc.color};font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap">${r.status || '—'}</span>
-              ${r.priority ? `<span style="background:${pc.bg};color:${pc.color};font-size:11px;padding:2px 8px;border-radius:20px;white-space:nowrap">優先：${r.priority}</span>` : ''}
-            </div>
+
+          <!-- 第一層：狀態 + 優先序（左對齊橫排） -->
+          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+            <span style="background:${sc.bg};color:${sc.color};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${r.status || '—'}</span>
+            ${r.priority ? `<span style="background:${pc.bg};color:${pc.color};font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px">優先：${r.priority}</span>` : ''}
           </div>
 
-          ${r.problemDesc ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;line-height:1.6"><span style="color:var(--text);font-weight:500">問題：</span>${r.problemDesc}</div>` : ''}
-          ${r.painPoint   ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;line-height:1.6"><span style="color:var(--text);font-weight:500">痛點：</span>${r.painPoint}</div>` : ''}
+          <!-- 第二層：標題（最大最粗） -->
+          <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px">${r.title || '（未命名）'}</div>
 
+          <!-- 第三層：單位 · 窗口 · 負責人（一行） -->
+          <div style="font-size:12px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:12px">
+            <span>${r.unitName || '—'}</span>
+            ${r.contact  ? `<span style="color:#e2e8f0">·</span><span>窗口 <strong style="color:var(--text)">${r.contact}</strong></span>`  : ''}
+            ${r.assignee ? `<span style="color:#e2e8f0">·</span><span>負責 <strong style="color:var(--text)">${r.assignee}</strong></span>` : ''}
+          </div>
+
+          <div style="height:1px;background:#f1f5f9;margin-bottom:12px"></div>
+
+          <!-- 第四層：問題描述 -->
+          ${r.problemDesc ? `<div style="font-size:13px;color:var(--text);line-height:1.65;margin-bottom:10px">${r.problemDesc}</div>` : ''}
+
+          <!-- 第五層：AI 解法方向 -->
           ${r.aiDirection ? `
-            <div style="background:#eff6ff;border-left:3px solid #2563eb;border-radius:0 6px 6px 0;padding:7px 10px;margin:8px 0;font-size:12px;color:#1d4ed8;line-height:1.6">
-              💡 ${r.aiDirection}
+            <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:12px">
+              <span style="font-size:14px;flex-shrink:0;line-height:1.5">💡</span>
+              <span style="font-size:12.5px;color:#2563eb;font-weight:600;line-height:1.55">${r.aiDirection}</span>
             </div>` : ''}
 
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">
-            ${r.feasibility ? `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;color:var(--text-muted)">可行性：<strong style="color:${fc}">${r.feasibility}</strong></span>` : ''}
-            ${r.complexity  ? `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;color:var(--text-muted)">複雜度：<strong style="color:var(--text)">${r.complexity}</strong></span>` : ''}
-            ${r.dataReady   ? `<span style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;color:var(--text-muted)">資料：<strong style="color:var(--text)">${r.dataReady}</strong></span>` : ''}
+          <!-- 第六層：評估摘要列（灰底一條） -->
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:8px 12px;background:#f8fafc;border-radius:8px;margin-bottom:10px;font-size:12px">
+            ${r.feasibility ? `<span style="color:var(--text-muted)">可行性 <strong style="color:${fc}">${r.feasibility}</strong></span>` : ''}
+            ${r.complexity  ? `<span style="color:var(--text-muted)">複雜度 <strong style="color:${cc}">${r.complexity}</strong></span>` : ''}
+            ${r.dataReady   ? `<span style="color:var(--text-muted)">資料 <strong style="color:var(--text)">${r.dataReady}</strong></span>` : ''}
+            ${r.expectedBenefit ? `<span style="color:var(--text-muted);margin-left:auto;text-align:right;white-space:nowrap">${r.expectedBenefit}</span>` : ''}
           </div>
 
-          ${r.feasibilityNote ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;line-height:1.5">📝 ${r.feasibilityNote}</div>` : ''}
-
-          <div style="border-top:1px solid #f1f5f9;padding-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
-            <div style="font-size:12px;color:var(--text-muted)">
-              ${r.assignee ? `負責人：<strong style="color:var(--text)">${r.assignee}</strong>` : ''}
-              ${r.expectedBenefit ? `<span style="margin-left:${r.assignee?'10px':'0'}">預期效益：${r.expectedBenefit}</span>` : ''}
-            </div>
-            <div style="font-size:11px;color:#94a3b8;text-align:right">
-              ${r.linkedCase ? `<span style="color:var(--primary);font-weight:500">→ ${r.linkedCase}</span>  ` : ''}
-              ${r.lastUpdated || ''}
-            </div>
+          <!-- 第七層：連結案例 + 日期 -->
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+            ${r.linkedCase ? `<span style="color:var(--primary);font-weight:600">→ ${r.linkedCase}</span>` : '<span></span>'}
+            <span style="color:#94a3b8">${r.lastUpdated || ''}</span>
           </div>
+
         </div>`;
     }).join('')}
   </div>`;
@@ -1335,6 +1341,19 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.7.1',
+    date: '2026-05-28',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: [
+      '需求管理卡片重新設計：狀態+優先序移至左上橫排、標題加大加粗',
+      '單位/窗口/負責人合併為一行 meta 列，資訊更緊湊',
+      '評估摘要（可行性/複雜度/資料備齊/預期效益）整合為灰底條，一行掃完',
+      '複雜度改為顏色編碼：高=紅、中=橙、低=綠',
+      'AI 解法方向去除重藍框，改為 💡 圖示+藍色文字',
+    ],
+  },
   {
     version: 'v2.7.0',
     date: '2026-05-28',
