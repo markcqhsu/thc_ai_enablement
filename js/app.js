@@ -547,58 +547,58 @@ function requirementCards(list) {
       <div class="placeholder-sub">請在 Google Sheets 的 requirements 分頁填入資料</div>
     </div>`;
 
+  const row = (label, value, valueColor) => {
+    if (!value) return '';
+    return `
+      <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #f8fafc;align-items:flex-start">
+        <span style="font-size:11px;color:var(--text-muted);width:90px;flex-shrink:0;padding-top:1px;line-height:1.5">${label}</span>
+        <span style="font-size:12.5px;color:${valueColor||'var(--text)'};font-weight:${valueColor?'600':'400'};flex:1;line-height:1.5">${value}</span>
+      </div>`;
+  };
+
+  const sep = () => `<div style="height:10px"></div>`;
+
   return `<div class="case-grid">
     ${list.map(r => {
-      const sc = STATUS_CONFIG[r.status]      || { bg: '#f1f5f9', color: '#64748b' };
-      const pc = PRIORITY_CONFIG[r.priority]  || { bg: '#f1f5f9', color: '#64748b' };
-      const fc = FEASIBILITY_COLOR[r.feasibility] || '#94a3b8';
-      const cc = COMPLEXITY_COLOR[r.complexity]   || '#94a3b8';
+      const sc = STATUS_CONFIG[r.status]           || { bg: '#f1f5f9', color: '#64748b' };
+      const pc = PRIORITY_CONFIG[r.priority]       || { bg: '#f1f5f9', color: '#64748b' };
+      const fc = FEASIBILITY_COLOR[r.feasibility]  || '#94a3b8';
+      const cc = COMPLEXITY_COLOR[r.complexity]    || '#94a3b8';
 
       return `
         <div class="case-card">
-
-          <!-- 第一層：狀態 + 優先序（左對齊橫排） -->
-          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-            <span style="background:${sc.bg};color:${sc.color};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${r.status || '—'}</span>
-            ${r.priority ? `<span style="background:${pc.bg};color:${pc.color};font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px">優先：${r.priority}</span>` : ''}
+          <!-- 狀態 + 優先序 標籤 -->
+          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+            <span style="background:${sc.bg};color:${sc.color};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">目前狀態：${r.status || '—'}</span>
+            ${r.priority ? `<span style="background:${pc.bg};color:${pc.color};font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px">優先序：${r.priority}</span>` : ''}
           </div>
 
-          <!-- 第二層：標題（最大最粗） -->
-          <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px">${r.title || '（未命名）'}</div>
+          <!-- 基本資料 -->
+          ${row('需求標題',    r.title)}
+          ${row('所屬單位',    r.unitName)}
+          ${row('單位窗口',    r.contact)}
+          ${row('訪談日期',    r.interviewDate)}
+          ${row('負責人',      r.assignee)}
+          ${sep()}
 
-          <!-- 第三層：單位 · 窗口 · 負責人（一行） -->
-          <div style="font-size:12px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:12px">
-            <span>${r.unitName || '—'}</span>
-            ${r.contact  ? `<span style="color:#e2e8f0">·</span><span>窗口 <strong style="color:var(--text)">${r.contact}</strong></span>`  : ''}
-            ${r.assignee ? `<span style="color:#e2e8f0">·</span><span>負責 <strong style="color:var(--text)">${r.assignee}</strong></span>` : ''}
-          </div>
+          <!-- 問題描述 -->
+          ${row('問題描述',    r.problemDesc)}
+          ${row('現有流程',    r.currentProcess)}
+          ${row('痛點',        r.painPoint)}
+          ${row('資料是否備齊', r.dataReady)}
+          ${sep()}
 
-          <div style="height:1px;background:#f1f5f9;margin-bottom:12px"></div>
+          <!-- AI 評估 -->
+          ${row('AI 解法方向', r.aiDirection,     '#2563eb')}
+          ${row('可行性',      r.feasibility,     fc)}
+          ${row('實作複雜度',  r.complexity,      cc)}
+          ${row('預期效益',    r.expectedBenefit)}
+          ${row('評估說明',    r.feasibilityNote)}
+          ${sep()}
 
-          <!-- 第四層：問題描述 -->
-          ${r.problemDesc ? `<div style="font-size:13px;color:var(--text);line-height:1.65;margin-bottom:10px">${r.problemDesc}</div>` : ''}
-
-          <!-- 第五層：AI 解法方向 -->
-          ${r.aiDirection ? `
-            <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:12px">
-              <span style="font-size:14px;flex-shrink:0;line-height:1.5">💡</span>
-              <span style="font-size:12.5px;color:#2563eb;font-weight:600;line-height:1.55">${r.aiDirection}</span>
-            </div>` : ''}
-
-          <!-- 第六層：評估摘要列（灰底一條） -->
-          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:8px 12px;background:#f8fafc;border-radius:8px;margin-bottom:10px;font-size:12px">
-            ${r.feasibility ? `<span style="color:var(--text-muted)">可行性 <strong style="color:${fc}">${r.feasibility}</strong></span>` : ''}
-            ${r.complexity  ? `<span style="color:var(--text-muted)">複雜度 <strong style="color:${cc}">${r.complexity}</strong></span>` : ''}
-            ${r.dataReady   ? `<span style="color:var(--text-muted)">資料 <strong style="color:var(--text)">${r.dataReady}</strong></span>` : ''}
-            ${r.expectedBenefit ? `<span style="color:var(--text-muted);margin-left:auto;text-align:right;white-space:nowrap">${r.expectedBenefit}</span>` : ''}
-          </div>
-
-          <!-- 第七層：連結案例 + 日期 -->
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
-            ${r.linkedCase ? `<span style="color:var(--primary);font-weight:600">→ ${r.linkedCase}</span>` : '<span></span>'}
-            <span style="color:#94a3b8">${r.lastUpdated || ''}</span>
-          </div>
-
+          <!-- 追蹤 -->
+          ${row('連結案例',    r.linkedCase,  'var(--primary)')}
+          ${row('最後更新',    r.lastUpdated)}
         </div>`;
     }).join('')}
   </div>`;
@@ -1341,6 +1341,17 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.7.2',
+    date: '2026-05-28',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: [
+      '需求管理卡片改為標籤列格式：每個欄位都有說明標題（需求標題、所屬單位、單位窗口、問題描述、現有流程、痛點等）',
+      '欄位依「基本資料 / 問題描述 / AI評估 / 追蹤」分群，視覺有層次',
+      '可行性與複雜度以顏色標示（高/中/低）',
+    ],
+  },
   {
     version: 'v2.7.1',
     date: '2026-05-28',
