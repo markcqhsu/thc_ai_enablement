@@ -218,7 +218,7 @@ function renderDashboard(el) {
             <div class="api-dash-row">
               <span class="api-dash-unit">${r.unit}</span>
               <span class="api-provider-badge api-provider-${r.provider.toLowerCase()}" style="flex-shrink:0">${r.provider}</span>
-              <div style="flex:1;background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden;min-width:40px">
+              <div class="api-dash-bar">
                 <div style="width:${pct}%;height:100%;background:${over ? '#ef4444' : '#2563eb'};border-radius:4px"></div>
               </div>
               <span class="api-dash-amount" style="color:${over ? '#ef4444' : 'var(--text-muted)'};font-weight:${over ? '600' : '400'}">
@@ -238,16 +238,16 @@ function renderDashboard(el) {
         <!-- Summary bars -->
         <div class="maturity-summary">
           ${levelCounts.map(l => `
-            <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-              <div style="display:flex;align-items:center;gap:6px;width:100px;flex-shrink:0;padding-top:1px">
+            <div class="msummary-row">
+              <div class="msummary-label">
                 <span class="level-badge" style="background:${l.color};font-size:10px;width:24px;height:24px;flex-shrink:0">${l.level}</span>
-                <span style="font-size:12px;color:var(--text-muted)">${l.label}</span>
+                <span class="msummary-name">${l.label}</span>
               </div>
               <div style="flex:1;min-width:0">
-                <div style="background:#f1f5f9;border-radius:4px;height:16px;overflow:hidden">
-                  <div style="width:${l.count ? (l.count/maxCount)*100 : 0}%;height:100%;background:${l.color};border-radius:4px;transition:width .5s ease"></div>
+                <div class="msummary-bar-wrap">
+                  <div class="msummary-bar" style="width:${l.count ? (l.count/maxCount)*100 : 0}%;background:${l.color}"></div>
                 </div>
-                <div style="font-size:10px;color:#94a3b8;margin-top:3px">${l.desc}</div>
+                <div class="msummary-desc">${l.desc}</div>
               </div>
               <span class="msummary-count">${l.count} 單位</span>
             </div>

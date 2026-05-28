@@ -370,12 +370,13 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
 .stat-label { font-size: 12px; color: var(--text-muted); }
 
 /* ── Maturity Summary ── */
-.maturity-summary { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.maturity-summary { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
 .msummary-row { display: flex; align-items: flex-start; gap: 10px; }
-.msummary-label { display: flex; align-items: center; gap: 6px; width: 100px; flex-shrink: 0; }
+.msummary-label { display: flex; align-items: center; gap: 6px; width: 100px; flex-shrink: 0; padding-top: 1px; }
 .msummary-name { font-size: 12px; color: var(--text-muted); }
-.msummary-bar-wrap { flex: 1; background: #f1f5f9; border-radius: 4px; height: 16px; overflow: hidden; }
+.msummary-bar-wrap { background: #f1f5f9; border-radius: 4px; height: 16px; overflow: hidden; }
 .msummary-bar { height: 100%; border-radius: 4px; transition: width 0.5s ease; min-width: 0; }
+.msummary-desc { font-size: 10px; color: #94a3b8; margin-top: 3px; }
 .msummary-count { width: 44px; font-size: 12px; color: var(--text-muted); text-align: right; flex-shrink: 0; }
 
 /* ── Region groups ── */
@@ -524,6 +525,14 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.api-dash-bar {
+  flex: 1;
+  background: #f1f5f9;
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+  min-width: 40px;
+}
 .api-dash-amount {
   width: 100px;
   font-size: 12px;
@@ -645,11 +654,20 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
   /* API usage → 1 col */
   .api-usage-grid { grid-template-columns: 1fr; }
 
-  /* API dashboard summary row */
+  /* API dashboard summary */
   .api-dash-header { flex-direction: column; align-items: flex-start; }
-  .api-dash-meta { gap: 8px; }
-  .api-dash-unit { width: 80px; }
+  .api-dash-meta { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .api-dash-unit { width: 76px; }
   .api-dash-amount { width: auto; }
+
+  /* API bar moves to its own full-width row on mobile */
+  .api-dash-row { flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+  .api-dash-bar { order: 10; flex: none; width: 100%; height: 6px; }
+  .api-dash-amount { margin-left: auto; }
+
+  /* Maturity summary label narrower → more bar space */
+  .msummary-label { width: 82px; }
+  .msummary-count { width: 50px; font-size: 11px; }
 
   /* Plan step cards → stack vertically */
   .plan-steps-row { flex-direction: column !important; row-gap: 10px !important; }
