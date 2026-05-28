@@ -1129,6 +1129,49 @@ function renderPlan(el) {
 
 const CHANGELOG = [
   {
+    version: 'v2.6.4',
+    date: '2026-05-28',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: [
+      '修正成熟度矩陣在手機上卡片超出螢幕寬度的問題（grid min-width: 0）',
+      '成熟度 label 欄縮窄至 70px，讓進度條有更多空間',
+      '成熟度 detail table wrapper 加 max-width: 100% 防止撐寬父容器',
+    ],
+  },
+  {
+    version: 'v2.6.3',
+    date: '2026-05-28',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: [
+      'API 用量進度條在手機上改為獨佔一整行（由一個點變為完整的條）',
+      'API 摘要「查看詳情」改為換行顯示，不再擠在同一行',
+      '成熟度摘要改用 CSS class，mobile media query 可正確覆寫',
+    ],
+  },
+  {
+    version: 'v2.6.2',
+    date: '2026-05-28',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: [
+      '導入計畫步驟卡在手機上改為垂直排列，不再出現最後一張只佔半行的問題',
+      '步驟間橫向箭頭在手機上隱藏',
+      'API 摘要標題列在手機上自動換行',
+    ],
+  },
+  {
+    version: 'v2.6.1',
+    date: '2026-05-28',
+    tag: '修復',
+    tagColor: '#f59e0b',
+    items: [
+      '導入計畫頁版面修正',
+      '成果驗證文字調整',
+    ],
+  },
+  {
     version: 'v2.6.0',
     date: '2026-05-25',
     tag: '功能',
