@@ -255,7 +255,7 @@ function renderDashboard(el) {
         </div>
 
         <!-- Detail table -->
-        <div style="margin-top:16px;overflow-x:auto">
+        <div style="margin-top:16px;overflow-x:auto;max-width:100%;width:100%">
           <table class="maturity-table">
             <thead>
               <tr>

@@ -665,8 +665,9 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
   .api-dash-bar { order: 10; flex: none; width: 100%; height: 6px; }
   .api-dash-amount { margin-left: auto; }
 
-  /* Maturity summary label narrower → more bar space */
-  .msummary-label { width: 82px; }
+  /* Maturity: prevent card from overflowing grid, tighten label */
+  .two-col > * { min-width: 0; }
+  .msummary-label { width: 70px; }
   .msummary-count { width: 50px; font-size: 11px; }
 
   /* Plan step cards → stack vertically */
@@ -686,14 +687,14 @@ a { text-decoration: none; cursor: pointer; color: inherit; }
   .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; flex-wrap: nowrap; }
   .tab-btn { white-space: nowrap; flex-shrink: 0; }
 
-  /* Tables → horizontal scroll */
+  /* Tables → horizontal scroll (overflow handled by wrapper div) */
   .data-table,
   .maturity-table,
   .cases-mini-table {
     display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     white-space: nowrap;
+    width: max-content;
+    max-width: none;
   }
   .data-table td,
   .data-table th { white-space: nowrap; }
