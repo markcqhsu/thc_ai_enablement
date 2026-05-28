@@ -104,7 +104,15 @@ function renderDashboard(el) {
   const apiLatest = api_usage.filter(r => r.month === apiLatestMonth);
   const apiTotalCost = apiLatest.reduce((s, r) => s + r.cost_usd, 0);
   const apiTotalBudget = apiLatest.reduce((s, r) => s + r.budget_usd, 0);
-  const apiOverCount = apiLatest.filter(r => r.cost_usd > r.budget_usd).length;
+  // Group by unit for dashboard display
+  const apiUnitMap = {};
+  apiLatest.forEach(r => {
+    if (!apiUnitMap[r.unit]) apiUnitMap[r.unit] = { unit: r.unit, provider: r.provider, cost_usd: 0, budget_usd: 0 };
+    apiUnitMap[r.unit].cost_usd += r.cost_usd;
+    apiUnitMap[r.unit].budget_usd += r.budget_usd;
+  });
+  const apiUnitList = Object.values(apiUnitMap);
+  const apiOverCount = apiUnitList.filter(u => u.cost_usd > u.budget_usd).length;
 
   // Build parent-child map
   const childrenOf = {};
@@ -211,7 +219,7 @@ function renderDashboard(el) {
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:9px">
-        ${apiLatest.map(r => {
+        ${apiUnitList.map(r => {
           const pct = Math.min(r.cost_usd / r.budget_usd * 100, 100);
           const over = r.cost_usd > r.budget_usd;
           return `
@@ -796,7 +804,22 @@ function renderApiUsage(el) {
 
   const totalCost   = latestData.reduce((s, r) => s + r.cost_usd, 0);
   const totalBudget = latestData.reduce((s, r) => s + r.budget_usd, 0);
-  const overUnits   = latestData.filter(r => r.cost_usd > r.budget_usd).length;
+
+  // Check if app field exists
+  const hasAppField = api_usage.some(r => r.app && r.app.trim());
+
+  // Group by unit
+  const unitGroups = {};
+  latestData.forEach(r => {
+    if (!unitGroups[r.unit]) {
+      unitGroups[r.unit] = { unit: r.unit, provider: r.provider, cost_usd: 0, budget_usd: 0, apps: [] };
+    }
+    unitGroups[r.unit].cost_usd += r.cost_usd;
+    unitGroups[r.unit].budget_usd += r.budget_usd;
+    unitGroups[r.unit].apps.push(r);
+  });
+  const unitGroupList = Object.values(unitGroups);
+  const overUnits = unitGroupList.filter(u => u.cost_usd > u.budget_usd).length;
 
   // Provider breakdown
   const byProvider = {};
@@ -819,7 +842,7 @@ function renderApiUsage(el) {
       </div>
       <div class="kpi-card purple">
         <div class="kpi-label">使用單位數</div>
-        <div class="kpi-value">${latestData.length}</div>
+        <div class="kpi-value">${unitGroupList.length}</div>
         <div class="kpi-sub">個單位本月有使用紀錄</div>
       </div>
     </div>
@@ -870,28 +893,61 @@ function renderApiUsage(el) {
       各單位用量（${latestMonth}）
     </div>
     <div class="api-usage-grid">
-      ${latestData.map(r => {
-        const pct = Math.min(r.cost_usd / r.budget_usd * 100, 100);
-        const over = r.cost_usd > r.budget_usd;
-        const provClass = `api-provider-${r.provider.toLowerCase()}`;
+      ${unitGroupList.map(g => {
+        const pct = Math.min(g.cost_usd / g.budget_usd * 100, 100);
+        const over = g.cost_usd > g.budget_usd;
+        const provClass = `api-provider-${g.provider.toLowerCase()}`;
+        const showApps = hasAppField && g.apps.some(r => r.app && r.app.trim());
         return `
           <div class="api-unit-card">
             <div class="api-unit-header">
-              <div class="api-unit-name">${r.unit}</div>
-              <span class="api-provider-badge ${provClass}">${r.provider}</span>
+              <div class="api-unit-name">${g.unit}</div>
+              <span class="api-provider-badge ${provClass}">${g.provider}</span>
             </div>
-            <div class="api-budget-row">
-              <span>花費 / 預算</span>
-              <span style="color:${over ? '#ef4444' : 'var(--text)'};font-weight:${over ? '600' : '400'}">
-                ${over ? '⚠ ' : ''}$${r.cost_usd.toFixed(2)} / $${r.budget_usd.toFixed(2)}
-              </span>
-            </div>
-            <div class="api-budget-bar">
-              <div class="api-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
-            </div>
-            <div class="api-stats-row">
-              <span>使用率：<span class="api-stat-num${over ? ' api-over-warn' : ''}">${Math.round(r.cost_usd / r.budget_usd * 100)}%</span></span>
-            </div>
+            ${showApps ? `
+              <div style="display:flex;flex-direction:column;gap:10px;margin:10px 0 14px">
+                ${g.apps.map(r => {
+                  const appPct = Math.min(r.cost_usd / g.budget_usd * 100, 100);
+                  return `
+                    <div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                        <span style="font-size:12px;font-weight:600;color:var(--text)">${r.app || '（未命名）'}</span>
+                        <span style="font-size:12px;color:var(--text-muted)">$${r.cost_usd.toFixed(2)}</span>
+                      </div>
+                      <div style="background:#f1f5f9;border-radius:3px;height:6px;overflow:hidden">
+                        <div style="width:${appPct}%;height:100%;background:#2563eb;border-radius:3px"></div>
+                      </div>
+                    </div>`;
+                }).join('')}
+              </div>
+              <div style="border-top:1px solid #f1f5f9;padding-top:12px">
+                <div class="api-budget-row">
+                  <span>總花費 / 預算</span>
+                  <span style="color:${over ? '#ef4444' : 'var(--text)'};font-weight:${over ? '600' : '400'}">
+                    ${over ? '⚠ ' : ''}$${g.cost_usd.toFixed(2)} / $${g.budget_usd.toFixed(2)}
+                  </span>
+                </div>
+                <div class="api-budget-bar">
+                  <div class="api-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
+                </div>
+                <div class="api-stats-row">
+                  <span>使用率：<span class="api-stat-num${over ? ' api-over-warn' : ''}">${Math.round(pct)}%</span></span>
+                </div>
+              </div>
+            ` : `
+              <div class="api-budget-row">
+                <span>花費 / 預算</span>
+                <span style="color:${over ? '#ef4444' : 'var(--text)'};font-weight:${over ? '600' : '400'}">
+                  ${over ? '⚠ ' : ''}$${g.cost_usd.toFixed(2)} / $${g.budget_usd.toFixed(2)}
+                </span>
+              </div>
+              <div class="api-budget-bar">
+                <div class="api-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
+              </div>
+              <div class="api-stats-row">
+                <span>使用率：<span class="api-stat-num${over ? ' api-over-warn' : ''}">${Math.round(pct)}%</span></span>
+              </div>
+            `}
           </div>`;
       }).join('')}
     </div>
@@ -902,15 +958,18 @@ function renderApiUsage(el) {
       <table class="data-table">
         <thead>
           <tr>
-            <th>月份</th><th>單位</th><th>Provider</th>
+            <th>月份</th><th>單位</th>
+            ${hasAppField ? '<th>應用</th>' : ''}
+            <th>Provider</th>
             <th>花費 (USD)</th><th>預算 (USD)</th><th>狀態</th>
           </tr>
         </thead>
         <tbody>
-          ${[...api_usage].sort((a,b) => b.month.localeCompare(a.month) || a.unit.localeCompare(b.unit)).map(r => `
+          ${[...api_usage].sort((a,b) => b.month.localeCompare(a.month) || a.unit.localeCompare(b.unit) || (a.app||'').localeCompare(b.app||'')).map(r => `
             <tr>
               <td style="color:var(--text-muted)">${r.month}</td>
               <td><strong>${r.unit}</strong></td>
+              ${hasAppField ? `<td style="color:var(--text-muted);font-size:12px">${r.app || '—'}</td>` : ''}
               <td><span class="api-provider-badge api-provider-${r.provider.toLowerCase()}">${r.provider}</span></td>
               <td style="font-weight:500">$${r.cost_usd.toFixed(2)}</td>
               <td style="color:var(--text-muted)">$${r.budget_usd.toFixed(2)}</td>
@@ -1128,6 +1187,17 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.6.5',
+    date: '2026-05-28',
+    tag: '功能',
+    tagColor: '#2563eb',
+    items: [
+      'API 用量管理頁新增「應用」欄位支援：單位卡片內顯示各應用名稱與個別用量條',
+      '所有紀錄表格新增「應用」欄（有填入 app 欄位時自動顯示）',
+      '集團總覽與 API 頁的單位數統計改為以單位為單位計算（而非以 row 計算）',
+    ],
+  },
   {
     version: 'v2.6.4',
     date: '2026-05-28',
