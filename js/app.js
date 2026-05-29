@@ -768,15 +768,40 @@ function caseCards(list) {
 
 // ── Talent ──
 
+const UNIT_PALETTE = [
+  { primary: '#2563eb', light: '#dbeafe', tag: '#eff6ff' },
+  { primary: '#7c3aed', light: '#ede9fe', tag: '#f5f3ff' },
+  { primary: '#059669', light: '#d1fae5', tag: '#ecfdf5' },
+  { primary: '#d97706', light: '#fef3c7', tag: '#fffbeb' },
+  { primary: '#dc2626', light: '#fee2e2', tag: '#fef2f2' },
+  { primary: '#0d9488', light: '#ccfbf1', tag: '#f0fdfa' },
+  { primary: '#db2777', light: '#fce7f3', tag: '#fdf2f8' },
+  { primary: '#6366f1', light: '#e0e7ff', tag: '#eef2ff' },
+];
+
+function unitColor(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
+  return UNIT_PALETTE[Math.abs(h) % UNIT_PALETTE.length];
+}
+
+const REGION_STYLE = {
+  '台灣':      { primary: '#4f46e5', light: '#eef2ff', border: '#c7d2fe' },
+  '中國':      { primary: '#dc2626', light: '#fef2f2', border: '#fecaca' },
+  '東南亞':    { primary: '#059669', light: '#ecfdf5', border: '#6ee7b7' },
+  '東南亞總部':{ primary: '#0d9488', light: '#f0fdfa', border: '#99f6e4' },
+};
+const REGION_DEFAULT = { primary: '#64748b', light: '#f8fafc', border: '#e2e8f0' };
+
 function renderTalent(el) {
-  const { talents, units, training, training_records, cases } = APP_DATA;
+  const { talents, units, training_records, cases } = APP_DATA;
 
   const seedCount = talents.filter(t => t.isSeed).length;
-  const regions = [...new Set(talents.map(t => t.region))];
+  const regions   = [...new Set(talents.map(t => t.region))];
+  const completed = training_records.filter(r => r.status === 'completed').length;
 
   el.innerHTML = `
-    <!-- Stats -->
-    <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px">
+    <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px">
       <div class="kpi-card purple">
         <div class="kpi-label">AI 人才總數</div>
         <div class="kpi-value">${talents.length}</div>
@@ -794,86 +819,108 @@ function renderTalent(el) {
       </div>
       <div class="kpi-card green">
         <div class="kpi-label">累計完課人次</div>
-        <div class="kpi-value">${training_records.filter(r=>r.status==='completed').length}</div>
+        <div class="kpi-value">${completed}</div>
         <div class="kpi-sub">已完成課程紀錄</div>
       </div>
     </div>
 
-    <!-- Talent cards grouped by region -->
-    ${regions.map(region => `
-      <div style="margin-bottom:24px">
-        <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <span style="width:3px;height:16px;background:#2563eb;border-radius:2px;display:inline-block"></span>
-          ${region}
-        </div>
-        <div class="talent-grid">
-          ${talents.filter(t=>t.region===region).map(t => `
-            <div class="talent-card">
-              <div class="talent-header">
-                <div class="talent-avatar" style="background:${t.isSeed?'#7c3aed':'#2563eb'}">${t.name.charAt(0)}</div>
-                <div>
-                  <div style="display:flex;align-items:center;gap:6px">
-                    <div class="talent-name">${t.name}</div>
-                    ${t.isSeed ? `<span class="seed-badge">種子</span>` : ''}
-                  </div>
-                  <div style="font-size:11px;color:#64748b;margin-top:2px">${t.unit}</div>
-                  <div style="margin-top:3px">
-                    <span class="tag" style="background:#f3e8ff;color:#7c3aed;font-size:10px">${t.role}</span>
-                  </div>
-                </div>
-              </div>
+    ${regions.map(region => {
+      const rs = REGION_STYLE[region] || REGION_DEFAULT;
+      const regionTalents = talents.filter(t => t.region === region);
+      const seedInRegion  = regionTalents.filter(t => t.isSeed).length;
 
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">支援範圍：${t.supportScope}</div>
+      return `
+        <div style="margin-bottom:32px">
+          <!-- Region header -->
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;background:${rs.light};border-left:4px solid ${rs.primary};margin-bottom:16px">
+            <span style="font-size:15px;font-weight:700;color:${rs.primary}">${region}</span>
+            <span style="font-size:12px;color:${rs.primary};opacity:.8">${regionTalents.length} 位人才</span>
+            ${seedInRegion ? `<span style="font-size:12px;color:${rs.primary};opacity:.8">・ 種子 ${seedInRegion} 位</span>` : ''}
+          </div>
 
-              <div class="skill-tags">
-                ${t.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}
-              </div>
+          <div class="talent-grid">
+            ${regionTalents.map(t => {
+              const uc = unitColor(t.unit || '');
+              const myCases   = cases.filter(c => c.owner === t.name);
+              const myRecords = training_records.filter(r => r.name === t.name);
+              const done      = myRecords.filter(r => r.status === 'completed');
+              const enrolled  = myRecords.filter(r => r.status === 'enrolled');
 
-              ${(() => {
-                const myCases = cases.filter(c => c.owner === t.name);
-                if (!myCases.length) return '';
-                return `
-                  <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
-                    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">負責專案</div>
-                    ${myCases.map(c => `
-                      <div style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:5px">
-                        ${stageTag(c.stage)}
-                        <span style="flex:1;color:var(--text)">${c.caseName}</span>
-                      </div>`).join('')}
-                  </div>`;
-              })()}
+              return `
+                <div style="background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden">
+                  <!-- 單位色頂部條 -->
+                  <div style="height:4px;background:${uc.primary}"></div>
 
-              ${(() => {
-                const myRecords = training_records.filter(r => r.name === t.name);
-                const completed = myRecords.filter(r => r.status === 'completed');
-                const enrolled  = myRecords.filter(r => r.status === 'enrolled');
-                if (!myRecords.length) return '';
-                return `
-                  <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
-                    ${completed.length ? `
-                      <div style="font-size:11px;color:#94a3b8;margin-bottom:5px">已完成</div>
-                      ${completed.map(r=>`
-                        <div style="display:flex;align-items:center;gap:4px;font-size:12px;margin-bottom:3px">
-                          <span style="color:#22c55e;font-weight:700">✓</span>${r.course}
-                          ${r.date ? `<span style="color:#94a3b8;font-size:10px">${r.date}</span>` : ''}
-                        </div>`).join('')}
+                  <div style="padding:16px">
+                    <!-- 姓名 + 頭像 -->
+                    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
+                      <div style="width:46px;height:46px;border-radius:50%;background:${uc.primary};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0">
+                        ${t.name.charAt(0)}
+                      </div>
+                      <div style="flex:1;min-width:0">
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+                          <span style="font-size:15px;font-weight:700;color:var(--text)">${t.name}</span>
+                          ${t.isSeed ? `<span class="seed-badge">種子</span>` : ''}
+                        </div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">${t.unit}</div>
+                        <span style="background:${uc.light};color:${uc.primary};font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px">${t.role}</span>
+                      </div>
+                    </div>
+
+                    <div style="height:1px;background:#f1f5f9;margin-bottom:10px"></div>
+
+                    <!-- 支援範圍 -->
+                    <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">支援範圍</div>
+                    <div style="font-size:12px;color:var(--text);font-weight:500;margin-bottom:10px">${t.supportScope}</div>
+
+                    <!-- 技能標籤（單位色） -->
+                    <div style="display:flex;flex-wrap:wrap;gap:4px">
+                      ${t.skills.map(s => `
+                        <span style="background:${uc.tag};color:${uc.primary};font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;border:1px solid ${uc.light}">${s}</span>
+                      `).join('')}
+                    </div>
+
+                    <!-- 負責專案 -->
+                    ${myCases.length ? `
+                      <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
+                        <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">負責專案</div>
+                        ${myCases.map(c => `
+                          <div style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:5px">
+                            ${stageTag(c.stage)}
+                            <span style="flex:1;color:var(--text)">${c.caseName}</span>
+                          </div>`).join('')}
+                      </div>
                     ` : ''}
-                    ${enrolled.length ? `
-                      <div style="font-size:11px;color:#94a3b8;margin:8px 0 5px">報名中</div>
-                      ${enrolled.map(r=>`
-                        <div style="display:flex;align-items:center;gap:4px;font-size:12px;margin-bottom:3px">
-                          <span style="color:#f59e0b;font-weight:700">○</span>${r.course}
-                        </div>`).join('')}
-                    ` : ''}
-                  </div>`;
-              })()}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `).join('')}
 
-    <!-- Units without AI staff -->
+                    <!-- 課程紀錄 -->
+                    ${myRecords.length ? `
+                      <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
+                        ${done.length ? `
+                          <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">已完成課程</div>
+                          ${done.map(r => `
+                            <div style="display:flex;align-items:center;gap:5px;font-size:12px;margin-bottom:4px">
+                              <span style="color:#22c55e;font-weight:700">✓</span>
+                              <span style="flex:1">${r.course}</span>
+                              ${r.date ? `<span style="color:#94a3b8;font-size:10px;white-space:nowrap">${r.date}</span>` : ''}
+                            </div>`).join('')}
+                        ` : ''}
+                        ${enrolled.length ? `
+                          <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin:8px 0 6px">報名中</div>
+                          ${enrolled.map(r => `
+                            <div style="display:flex;align-items:center;gap:5px;font-size:12px;margin-bottom:4px">
+                              <span style="color:#f59e0b;font-weight:700">○</span>${r.course}
+                            </div>`).join('')}
+                        ` : ''}
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    }).join('')}
+
+    <!-- 尚無 AI 人員的單位 -->
     ${(() => {
       const noStaff = units.filter(u => !u.aiStaff || !u.aiStaff.length);
       if (!noStaff.length) return '';
@@ -888,8 +935,7 @@ function renderTalent(el) {
               </div>
             `).join('')}
           </div>
-        </div>
-      `;
+        </div>`;
     })()}
   `;
 }
@@ -1399,6 +1445,19 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.7.4',
+    date: '2026-05-29',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: [
+      'AI 人才網路頁面重新設計：依單位 hash 自動配色（8色），每張卡頂部有彩色條',
+      '地區 header 改為彩色橫幅：台灣=靛藍、中國=紅、東南亞=綠/青',
+      '頭像顏色與技能標籤同步使用單位色，視覺一致',
+      '角色標籤、技能標籤全面使用單位色系，告別全站紫色',
+      '支援範圍、課程紀錄標題改為大寫小字，提升視覺層次',
+    ],
+  },
   {
     version: 'v2.7.3',
     date: '2026-05-29',
