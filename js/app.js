@@ -438,7 +438,7 @@ function unitsRows(list) {
           : '<span style="color:#94a3b8">—</span>'}
       </td>
       <td>${bool(u.needSupport)}</td>
-      <td>
+      <td style="white-space:nowrap">
         <span class="level-badge" style="background:${m.color}">${u.maturityLevel}</span>
         <span class="tag" style="background:${m.color}18;color:${m.color};margin-left:4px">${m.label}</span>
       </td>
