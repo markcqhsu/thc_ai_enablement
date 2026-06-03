@@ -1446,6 +1446,17 @@ function renderPlan(el) {
 
 const CHANGELOG = [
   {
+    version: 'v2.8.0',
+    date: '2026-06-03',
+    tag: '架構',
+    tagColor: '#7c3aed',
+    items: [
+      '資料載入改為 Google Apps Script Web App 架構',
+      '9 個分頁合併為單一 HTTP 請求，徹底解決 Sheets API 429 配額限制問題',
+      '移除 Sheets API Key，改用 Apps Script 代理存取',
+    ],
+  },
+  {
     version: 'v2.7.7',
     date: '2026-06-03',
     tag: '優化',

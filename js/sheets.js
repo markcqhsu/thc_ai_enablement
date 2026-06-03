@@ -1,37 +1,23 @@
-const SHEET_ID = '1xO3bhohlyLBzQ00xY0P-AAWeHxPh6EFg_ZTkFCWK1qg';
-const API_KEY  = 'AIzaSyDREiK8EEvC26TLoiKgs7kTgDzYX-XAhV0';
-const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+// ── 資料來源：Google Apps Script Web App ──
+// 9 個分頁合併為單一請求，避免 Sheets API 配額限制
+// Web App 設定：Execute as Me ／ Anyone can access
+// 部署後將 URL 填入下方
 
-async function fetchTab(tabName) {
-  const res = await fetch(`${BASE_URL}/${encodeURIComponent(tabName)}?key=${API_KEY}`);
-  if (!res.ok) throw new Error(`Tab "${tabName}" 讀取失敗: ${res.status}`);
-  const json = await res.json();
-  return json.values || [];
-}
-
-function toObjects(rows) {
-  if (!rows || rows.length < 2) return [];
-  const headers = rows[0];
-  return rows.slice(1)
-    .filter(row => row.some(c => c !== ''))
-    .map(row => {
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = (row[i] || '').trim(); });
-      return obj;
-    });
-}
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
 
 const toBool = v => v === 'TRUE' || v === 'true' || v === '是';
 const toArr  = v => v ? v.split(/[,、]/).map(s => s.trim()).filter(Boolean) : [];
 const toNum  = v => parseFloat(v) || 0;
 
 async function loadFromSheets() {
-  const TABS = ['regions', 'units', 'cases', 'talents', 'training', 'updates', 'api_usage', 'training_records', 'requirements'];
-  const results = await Promise.allSettled(TABS.map(t => fetchTab(t)));
-  const get = i => (results[i].status === 'fulfilled' ? results[i].value : []);
+  const res = await fetch(APPS_SCRIPT_URL);
+  if (!res.ok) throw new Error(`Web App 讀取失敗: ${res.status}`);
+  const data = await res.json();
 
-  // regions — merge by name: Sheets entries override matching mock rows, extras kept
-  const regRows = toObjects(get(0));
+  const get = key => data[key] || [];
+
+  // regions
+  const regRows = get('regions');
   if (regRows.length) {
     const sheetsNames = new Set(regRows.map(r => r.name));
     const kept = APP_DATA.regions.filter(r => !sheetsNames.has(r.name));
@@ -39,7 +25,7 @@ async function loadFromSheets() {
   }
 
   // units
-  const unitRows = toObjects(get(1));
+  const unitRows = get('units');
   if (unitRows.length) {
     const sheetsUnitNames = new Set(unitRows.map(r => r.unitName));
     const kept = APP_DATA.units.filter(u => !sheetsUnitNames.has(u.unitName));
@@ -52,8 +38,8 @@ async function loadFromSheets() {
     APP_DATA.units = [...mapped, ...kept];
   }
 
-  // cases — merge: Sheets overrides by caseName, mock extras kept
-  const caseRows = toObjects(get(2));
+  // cases
+  const caseRows = get('cases');
   if (caseRows.length) {
     const sheetsCaseNames = new Set(caseRows.map(r => r.caseName));
     const keptCases = APP_DATA.cases.filter(c => !sheetsCaseNames.has(c.caseName));
@@ -67,7 +53,7 @@ async function loadFromSheets() {
   }
 
   // talents
-  const talentRows = toObjects(get(3));
+  const talentRows = get('talents');
   if (talentRows.length) {
     APP_DATA.talents = talentRows.map((t, i) => ({
       id: i + 1, ...t,
@@ -78,7 +64,7 @@ async function loadFromSheets() {
   }
 
   // training
-  const trainRows = toObjects(get(4));
+  const trainRows = get('training');
   if (trainRows.length) {
     APP_DATA.training = trainRows.map((t, i) => ({
       id: i + 1, ...t,
@@ -89,25 +75,25 @@ async function loadFromSheets() {
   }
 
   // updates
-  const updateRows = toObjects(get(5));
+  const updateRows = get('updates');
   if (updateRows.length) {
     APP_DATA.updates = updateRows;
   }
 
   // training_records
-  const trRecordRows = toObjects(get(7));
+  const trRecordRows = get('training_records');
   if (trRecordRows.length) {
     APP_DATA.training_records = trRecordRows;
   }
 
   // requirements
-  const reqRows = toObjects(get(8));
+  const reqRows = get('requirements');
   if (reqRows.length) {
     APP_DATA.requirements = reqRows;
   }
 
   // api_usage
-  const apiRows = toObjects(get(6));
+  const apiRows = get('api_usage');
   if (apiRows.length) {
     APP_DATA.api_usage = apiRows.map(r => ({
       ...r,
