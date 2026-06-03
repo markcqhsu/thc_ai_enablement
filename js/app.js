@@ -1446,6 +1446,15 @@ function renderPlan(el) {
 
 const CHANGELOG = [
   {
+    version: 'v2.7.7',
+    date: '2026-06-03',
+    tag: '優化',
+    tagColor: '#10b981',
+    items: [
+      '成熟度等級標籤更新：L1 現況盤點、L2 問題發現、L3 方案設計、L4 概念驗證、L5 正式導入',
+    ],
+  },
+  {
     version: 'v2.7.4',
     date: '2026-05-29',
     tag: '優化',
