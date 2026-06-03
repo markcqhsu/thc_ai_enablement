@@ -3,7 +3,7 @@
 // Web App 設定：Execute as Me ／ Anyone can access
 // 部署後將 URL 填入下方
 
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyc9DnD7qeh9Nx6HQjgk_shWD2iRoSkSTguKhqiIZDUfuSR3Z03CtAzIbs_wtUKJgAx0w/exec';
 
 const toBool = v => v === 'TRUE' || v === 'true' || v === '是';
 const toArr  = v => v ? v.split(/[,、]/).map(s => s.trim()).filter(Boolean) : [];
