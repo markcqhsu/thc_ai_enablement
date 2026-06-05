@@ -841,7 +841,7 @@ function renderTalent(el) {
           <div class="talent-grid">
             ${regionTalents.map(t => {
               const uc = unitColor(t.unit || '');
-              const myCases   = cases.filter(c => c.owner === t.name);
+              const myCases   = cases.filter(c => c.owner && c.owner.split(/[,、，\s]+/).map(s => s.trim()).includes(t.name));
               const myRecords = training_records.filter(r => r.name === t.name);
               const done      = myRecords.filter(r => r.status === 'completed');
               const enrolled  = myRecords.filter(r => r.status === 'enrolled');
@@ -1445,6 +1445,15 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.8.1',
+    date: '2026-06-05',
+    tag: '功能',
+    tagColor: '#0ea5e9',
+    items: [
+      '案例 owner 欄位支援多位負責人（以逗號或頓號分隔），人才網路頁面可對應顯示各人員負責專案',
+    ],
+  },
   {
     version: 'v2.8.0',
     date: '2026-06-03',
