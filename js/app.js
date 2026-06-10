@@ -416,7 +416,7 @@ function renderUnits(el) {
           <tr>
             <th>單位</th><th>地區</th><th>窗口</th><th>AI 人員</th>
             <th>需支援</th><th>目前階段</th><th>PoC 項目</th>
-            <th>預估效益</th><th>預計完成</th><th>最後更新</th>
+            <th>預估效益</th><th>預計完成</th><th>最後更新</th><th>備注</th>
           </tr>
         </thead>
         <tbody id="units-tbody">${unitsRows(units)}</tbody>
@@ -450,6 +450,7 @@ function unitsRows(list) {
       <td style="font-size:12px;color:#64748b;max-width:140px">${u.estimatedBenefit || '—'}</td>
       <td style="font-size:12px;color:#64748b;white-space:nowrap">${u.dueDate || '—'}</td>
       <td style="font-size:12px;color:#94a3b8;white-space:nowrap">${u.lastUpdated || '—'}</td>
+      <td style="font-size:12px;color:#64748b;max-width:160px">${u.remark || '<span style="color:#94a3b8">—</span>'}</td>
     </tr>`;
   }).join('');
 }
@@ -1445,6 +1446,15 @@ function renderPlan(el) {
 // ── Changelog ──
 
 const CHANGELOG = [
+  {
+    version: 'v2.8.2',
+    date: '2026-06-10',
+    tag: '功能',
+    tagColor: '#0ea5e9',
+    items: [
+      '單位追蹤表新增備注欄位，從 Excel 的 remark 欄位讀取並顯示',
+    ],
+  },
   {
     version: 'v2.8.1',
     date: '2026-06-05',
