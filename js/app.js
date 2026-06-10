@@ -55,6 +55,19 @@ function toggleSidebar() {
   document.getElementById('sidebar-overlay').classList.toggle('open');
 }
 
+function toggleSidebarCollapse() {
+  if (window.innerWidth < 768) return;
+  const sidebar = document.querySelector('.sidebar');
+  const collapsed = sidebar.classList.toggle('collapsed');
+  localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0');
+}
+
+function initSidebarCollapse() {
+  if (window.innerWidth >= 768 && localStorage.getItem('sidebar-collapsed') === '1') {
+    document.querySelector('.sidebar').classList.add('collapsed');
+  }
+}
+
 function closeSidebarOnMobile() {
   if (window.innerWidth < 768) {
     document.querySelector('.sidebar').classList.remove('open');
@@ -1447,6 +1460,15 @@ function renderPlan(el) {
 
 const CHANGELOG = [
   {
+    version: 'v2.8.3',
+    date: '2026-06-10',
+    tag: '體驗',
+    tagColor: '#7c3aed',
+    items: [
+      '左側選單支援收合，點擊 « / » 可切換 icon-only 模式，狀態自動記憶',
+    ],
+  },
+  {
     version: 'v2.8.2',
     date: '2026-06-10',
     tag: '功能',
@@ -1819,6 +1841,7 @@ async function init() {
   }
 
   navigate('dashboard');
+  initSidebarCollapse();
 }
 
 init();

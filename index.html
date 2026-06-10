@@ -11,42 +11,43 @@
     <aside class="sidebar">
       <div class="sidebar-logo">
         <div class="logo-badge">AI</div>
-        <div>
+        <div class="sidebar-logo-text">
           <div class="logo-title">宏全集團</div>
           <div class="logo-sub">AI 推動管理系統</div>
         </div>
+        <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="收起選單" aria-label="收起選單"></button>
       </div>
       <nav class="sidebar-nav">
-        <a class="nav-item" data-page="dashboard" onclick="navigate('dashboard')">
-          <span class="nav-icon">📊</span>集團總覽
+        <a class="nav-item" data-page="dashboard" onclick="navigate('dashboard')" title="集團總覽">
+          <span class="nav-icon">📊</span><span class="nav-label">集團總覽</span>
         </a>
-        <a class="nav-item" data-page="plan" onclick="navigate('plan')">
-          <span class="nav-icon">🗺️</span>導入計畫
+        <a class="nav-item" data-page="plan" onclick="navigate('plan')" title="導入計畫">
+          <span class="nav-icon">🗺️</span><span class="nav-label">導入計畫</span>
         </a>
-        <a class="nav-item" data-page="units" onclick="navigate('units')">
-          <span class="nav-icon">🏭</span>單位追蹤
+        <a class="nav-item" data-page="units" onclick="navigate('units')" title="單位追蹤">
+          <span class="nav-icon">🏭</span><span class="nav-label">單位追蹤</span>
         </a>
-        <a class="nav-item" data-page="requirements" onclick="navigate('requirements')">
-          <span class="nav-icon">🔍</span>需求管理
+        <a class="nav-item" data-page="requirements" onclick="navigate('requirements')" title="需求管理">
+          <span class="nav-icon">🔍</span><span class="nav-label">需求管理</span>
         </a>
-        <a class="nav-item" data-page="cases" onclick="navigate('cases')">
-          <span class="nav-icon">💡</span>AI 應用案例
+        <a class="nav-item" data-page="cases" onclick="navigate('cases')" title="AI 應用案例">
+          <span class="nav-icon">💡</span><span class="nav-label">AI 應用案例</span>
         </a>
-        <a class="nav-item" data-page="talent" onclick="navigate('talent')">
-          <span class="nav-icon">👥</span>AI 人才網路
+        <a class="nav-item" data-page="talent" onclick="navigate('talent')" title="AI 人才網路">
+          <span class="nav-icon">👥</span><span class="nav-label">AI 人才網路</span>
         </a>
-        <a class="nav-item" data-page="training" onclick="navigate('training')">
-          <span class="nav-icon">🎓</span>課程安排
+        <a class="nav-item" data-page="training" onclick="navigate('training')" title="課程安排">
+          <span class="nav-icon">🎓</span><span class="nav-label">課程安排</span>
         </a>
         <div class="nav-divider"></div>
-        <a class="nav-item" data-page="api" onclick="navigate('api')">
-          <span class="nav-icon">💳</span>API 用量
+        <a class="nav-item" data-page="api" onclick="navigate('api')" title="API 用量">
+          <span class="nav-icon">💳</span><span class="nav-label">API 用量</span>
         </a>
-        <a class="nav-item" data-page="changelog" onclick="navigate('changelog')">
-          <span class="nav-icon">📋</span>修改記錄
+        <a class="nav-item" data-page="changelog" onclick="navigate('changelog')" title="修改記錄">
+          <span class="nav-icon">📋</span><span class="nav-label">修改記錄</span>
         </a>
       </nav>
-      <div class="sidebar-footer">v2.8.2 · 資料來源：Google Sheets</div>
+      <div class="sidebar-footer">v2.8.3 · 資料來源：Google Sheets</div>
     </aside>
 
     <div class="main">
