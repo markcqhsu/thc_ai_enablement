@@ -1460,6 +1460,15 @@ function renderPlan(el) {
 
 const CHANGELOG = [
   {
+    version: 'v2.8.4',
+    date: '2026-07-23',
+    tag: '調整',
+    tagColor: '#64748b',
+    items: [
+      '左側選單暫時隱藏「AI 應用案例」頁面入口',
+    ],
+  },
+  {
     version: 'v2.8.3',
     date: '2026-06-10',
     tag: '體驗',
